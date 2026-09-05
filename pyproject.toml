@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oa-autograding"
+version = "1.0.0rc1"
+description = "Kontroly cvičení pro classroom50 (Markdown, Python, později PHP) s českou zpětnou vazbou pro žáky."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Adam Fišer" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+oa-check = "oa_autograding.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["oa_autograding*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
