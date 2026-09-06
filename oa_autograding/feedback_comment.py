@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 from datetime import datetime, timezone
 from typing import Callable, Mapping
 
@@ -32,10 +33,20 @@ def find_feedback_pr(gh: GhRunner, repo: str) -> int | None:
     return min(numbers) if numbers else None
 
 
-def list_submit_releases(gh: GhRunner, repo: str) -> list[dict]:
-    out = gh(["release", "list", "-R", repo, "--json", "tagName,publishedAt,url", "--limit", "100"])
+DEFAULT_SERVER_URL = "https://github.com"
+
+
+def release_url(server_url: str, repo: str, tag: str) -> str:
+    """`gh release list` pole `url` nemá, adresu proto skládáme sami."""
+    return f"{server_url.rstrip('/')}/{repo}/releases/tag/{urllib.parse.quote(tag, safe='')}"
+
+
+def list_submit_releases(gh: GhRunner, repo: str, server_url: str = DEFAULT_SERVER_URL) -> list[dict]:
+    out = gh(["release", "list", "-R", repo, "--json", "tagName,publishedAt", "--limit", "100"])
     rels = [r for r in json.loads(out or "[]") if str(r.get("tagName", "")).startswith("submit/")]
     rels.sort(key=lambda r: r.get("publishedAt", ""), reverse=True)
+    for r in rels:
+        r["url"] = release_url(server_url, repo, str(r["tagName"]))
     return rels
 
 
@@ -111,13 +122,14 @@ def main(gh: GhRunner = default_gh, env: Mapping[str, str] | None = None) -> int
     sha = env["GITHUB_SHA"]
     marker = env.get("OA_MARKER") or MARKER
     limit = int(env.get("OA_HISTORY_LIMIT") or 20)
-    run_url = f"{env.get('GITHUB_SERVER_URL', 'https://github.com')}/{repo}/actions/runs/{env.get('GITHUB_RUN_ID', '')}"
+    server_url = env.get("GITHUB_SERVER_URL") or DEFAULT_SERVER_URL
+    run_url = f"{server_url}/{repo}/actions/runs/{env.get('GITHUB_RUN_ID', '')}"
     try:
         pr = find_feedback_pr(gh, repo)
         if pr is None:
             print("::notice::Feedback PR neexistuje (vypnutý, nebo ještě nevznikl) — komentář se nepíše.")
             return 0
-        releases = list_submit_releases(gh, repo)
+        releases = list_submit_releases(gh, repo, server_url)
         release = find_release_for_sha(releases, sha)
         if release is None:
             body, history = render_error_body(run_url), []

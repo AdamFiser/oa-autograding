@@ -7,11 +7,17 @@ from oa_autograding.render import MARKER
 
 REPO = "org/1sk-ctvrtek-10-markdown-zak"
 SHA = "a1b2c3d4e5f6a7b8"
+# Reálná množina polí `gh release list --json` (ověřeno gh 2.97) — `url` mezi nimi NENÍ.
+RELEASE_LIST_FIELDS = {
+    "createdAt", "isDraft", "isImmutable", "isLatest", "isPrerelease", "name", "publishedAt", "tagName",
+}
 RELEASES = [
-    {"tagName": "submit/2026-09-05T12-32-05Z-a1b2c3d", "publishedAt": "2026-09-05T12:32:20Z", "url": "https://r/2"},
-    {"tagName": "submit/2026-09-05T12-10-00Z-9f8e7d6", "publishedAt": "2026-09-05T12:10:20Z", "url": "https://r/1"},
-    {"tagName": "latest", "publishedAt": "2026-09-05T12:32:21Z", "url": "https://r/latest"},
+    {"tagName": "submit/2026-09-05T12-32-05Z-a1b2c3d", "publishedAt": "2026-09-05T12:32:20Z"},
+    {"tagName": "submit/2026-09-05T12-10-00Z-9f8e7d6", "publishedAt": "2026-09-05T12:10:20Z"},
+    {"tagName": "latest", "publishedAt": "2026-09-05T12:32:21Z"},
 ]
+URL_2 = f"https://github.com/{REPO}/releases/tag/submit%2F2026-09-05T12-32-05Z-a1b2c3d"
+URL_1 = f"https://github.com/{REPO}/releases/tag/submit%2F2026-09-05T12-10-00Z-9f8e7d6"
 RESULTS = {
     "submit/2026-09-05T12-32-05Z-a1b2c3d": {"datetime": "2026-09-05T12:32:05Z", "score": 3, "max-score": 4,
         "tests": [{"test-name": "A1 X", "passed": True}, {"test-name": "A2 Kotva", "passed": False}]},
@@ -31,6 +37,10 @@ class FakeGh:
         if args[:2] == ["pr", "list"]:
             return json.dumps([{"number": n} for n in self.prs])
         if args[:2] == ["release", "list"]:
+            fields = args[args.index("--json") + 1].split(",")
+            bad = [f for f in fields if f not in RELEASE_LIST_FIELDS]
+            if bad:
+                raise fc.GhError(f'release list: Unknown JSON field: "{bad[0]}"')
             return json.dumps(self.releases)
         if args[:2] == ["release", "view"]:
             return self.body
@@ -54,15 +64,42 @@ def test_find_feedback_pr():
 def test_releases_filter_and_match():
     rels = fc.list_submit_releases(FakeGh(), REPO)
     assert [r["tagName"] for r in rels] == [RELEASES[0]["tagName"], RELEASES[1]["tagName"]]
-    assert fc.find_release_for_sha(rels, SHA)["url"] == "https://r/2"
+    assert fc.find_release_for_sha(rels, SHA)["url"] == URL_2
     assert fc.find_release_for_sha(rels, "0000000") is None
+
+
+def test_releases_request_only_real_json_fields():
+    gh = FakeGh()
+    fc.list_submit_releases(gh, REPO)
+    call = [c for c in gh.calls if c[:2] == ["release", "list"]][0]
+    assert call[call.index("--json") + 1] == "tagName,publishedAt"
+
+
+def test_fake_gh_rejects_url_field_like_real_gh():
+    with pytest.raises(fc.GhError, match="url"):
+        FakeGh()(["release", "list", "-R", REPO, "--json", "tagName,publishedAt,url", "--limit", "100"])
+
+
+def test_release_url_is_synthesized_from_server_url():
+    rels = fc.list_submit_releases(FakeGh(), REPO, server_url="https://ghe.skola.cz")
+    assert rels[0]["url"] == f"https://ghe.skola.cz/{REPO}/releases/tag/submit%2F2026-09-05T12-32-05Z-a1b2c3d"
+
+
+def test_main_uses_github_server_url_from_env():
+    gh = FakeGh(comments=[555])
+    env = {"GITHUB_REPOSITORY": REPO, "GITHUB_SHA": SHA, "GITHUB_RUN_ID": "1",
+           "GITHUB_SERVER_URL": "https://ghe.skola.cz"}
+    assert fc.main(gh, env) == 0
+    patch = [c for c in gh.calls if "-X" in c][-1]
+    payload = json.loads(open(patch[patch.index("--input") + 1], encoding="utf-8").read())
+    assert f"https://ghe.skola.cz/{REPO}/releases/tag/submit%2F" in payload["body"]
 
 
 def test_build_history_limit_and_labels():
     rels = fc.list_submit_releases(FakeGh(), REPO)
     hist = fc.build_history(FakeGh(), REPO, rels, limit=1)
     assert len(hist) == 1 and hist[0].sha7 == "a1b2c3d" and hist[0].failed_labels == ["A2"]
-    assert hist[0].score == 3 and hist[0].release_url == "https://r/2"
+    assert hist[0].score == 3 and hist[0].release_url == URL_2
     assert hist[0].when.isoformat() == "2026-09-05T12:32:05+00:00"
 
 
