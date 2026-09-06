@@ -70,5 +70,8 @@ def registered_types() -> list[str]:
 
 
 def strip_code_blocks(text: str) -> str:
-    """Nahradí fenced bloky kódu prázdnými řádky (regexy pak nevidí falešné nadpisy)."""
-    return re.sub(r"```.*?```", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
+    """Nahradí fenced bloky kódu a HTML komentáře prázdnými řádky (regexy pak nevidí falešné nadpisy
+    ani příkladovou syntaxi schovanou v komentáři)."""
+    text = re.sub(r"```.*?```", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
+    text = re.sub(r"<!--.*?-->", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
+    return text

@@ -41,3 +41,9 @@ def test_no_marker_custom(repo):
     repo.write("a.py", "pass  # FIXME\n")
     ctx = CheckContext.for_file(repo.root, "a.py")
     assert not base.get("file.no-marker").fn(ctx, {"marker": "FIXME"}).passed
+
+
+def test_no_marker_still_sees_markers_in_comments(repo):
+    repo.write("a.md", "<!-- TODO 1 -->\n")
+    ctx = CheckContext.for_file(repo.root, "a.md")
+    assert not base.get("file.no-marker").fn(ctx, {}).passed

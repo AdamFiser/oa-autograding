@@ -28,6 +28,11 @@ def test_details(repo):
     assert not res.passed and "summary" in res.reason
 
 
+def test_details_ignores_html_comment(repo):
+    res = run(repo, "<!-- <details><summary>x</summary>y</details> -->\n", "md.details")
+    assert not res.passed
+
+
 def test_checkboxes_pass(repo):
     assert run(repo, "- [x] a\n- [ ] b\n- [ ] c\n", "md.checkboxes", min_items=3).passed
 

@@ -216,7 +216,7 @@ def blockquote(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
 
 @register("md.details")
 def details(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
-    t = ctx.raw.lower()
+    t = ctx.no_code.lower()
     if "<details>" in t and "</details>" in t and "<summary>" in t:
         return CheckResult(True)
     return CheckResult(False, "Chybí sbalitelný blok `<details><summary>Nadpis</summary> obsah </details>` (včetně `<summary>`).")

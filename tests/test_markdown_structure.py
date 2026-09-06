@@ -63,6 +63,11 @@ def test_anchor_link(repo):
     assert not res.passed and "#kotva" in res.reason
 
 
+def test_anchor_link_ignores_html_comment(repo):
+    res = run(repo, "<!-- např. [Funkce](#funkce) -->\n", "md.anchor-link")
+    assert not res.passed
+
+
 def test_list_unordered_min(repo):
     assert run(repo, "- a\n- b\n- c\n- d\n", "md.list", min_items=4).passed
     res = run(repo, "- a\n- b\n", "md.list", min_items=4)

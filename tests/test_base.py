@@ -20,6 +20,14 @@ def test_strip_code_blocks_keeps_line_count():
     assert out.count("\n") == text.count("\n")
 
 
+def test_strip_html_comments_keeps_line_count():
+    text = "a\n<!-- x\n# ne nadpis\n[k](#k) -->\nb"
+    out = strip_code_blocks(text)
+    assert "# ne nadpis" not in out
+    assert "(#k)" not in out
+    assert out.count("\n") == text.count("\n")
+
+
 def test_register_and_get(monkeypatch):
     monkeypatch.setattr(base, "_REGISTRY", {})
 
