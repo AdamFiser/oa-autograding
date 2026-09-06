@@ -1,0 +1,23 @@
+name: oa-autograding feedback comment
+description: Vloží nebo přepíše komentář s výsledkem automatické kontroly classroom50 do Feedback PR (česky, s historií odevzdání).
+inputs:
+  marker:
+    description: Skrytá značka, podle které se pozná náš komentář.
+    default: "<!-- oa-autograding -->"
+  history-limit:
+    description: Kolik posledních odevzdání zobrazit v historii.
+    default: "20"
+  token:
+    description: Token s právem pull-requests:write a contents:read.
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Komentář do Feedback PR
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        OA_MARKER: ${{ inputs.marker }}
+        OA_HISTORY_LIMIT: ${{ inputs.history-limit }}
+        PYTHONPATH: ${{ github.action_path }}/../../..
+      run: python3 -m oa_autograding.feedback_comment
