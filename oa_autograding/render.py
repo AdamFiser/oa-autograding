@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from oa_autograding.grade import GradeReport, TaskReport
 from oa_autograding.spec import resolve_docs
@@ -32,10 +33,8 @@ def _prague(dt: datetime) -> datetime:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     try:
-        from zoneinfo import ZoneInfo
-
         return dt.astimezone(ZoneInfo("Europe/Prague"))
-    except Exception:  # chybí tzdata (Windows bez balíčku)
+    except ZoneInfoNotFoundError:  # chybí tzdata (Windows bez balíčku)
         return dt.astimezone(timezone.utc)
 
 
@@ -43,14 +42,6 @@ def format_cz(dt: datetime, with_year: bool = True) -> str:
     d = _prague(dt)
     rok = f" {d.year}" if with_year else ""
     return f"{d.day}. {d.month}.{rok} {d:%H:%M}"
-
-
-def body_word(n: int) -> str:
-    if n == 1:
-        return "bod"
-    if 2 <= n <= 4:
-        return "body"
-    return "bodů"
 
 
 def of_word(n: int) -> str:

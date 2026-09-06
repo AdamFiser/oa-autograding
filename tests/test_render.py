@@ -83,3 +83,24 @@ def test_history_and_comment():
 def test_error_body():
     b = render_error_body("https://run")
     assert "technické chybě" in b and "https://run" in b
+
+
+def test_format_cz_missing_tzdata_falls_back_to_utc(monkeypatch):
+    import oa_autograding.render as render
+
+    def boom(_name):
+        raise render.ZoneInfoNotFoundError("no tzdata")
+
+    monkeypatch.setattr(render, "ZoneInfo", boom)
+    assert format_cz(T0) == "5. 9. 2026 12:32"
+
+
+def test_format_cz_other_error_propagates(monkeypatch):
+    import oa_autograding.render as render
+
+    def boom(_name):
+        raise RuntimeError("bum")
+
+    monkeypatch.setattr(render, "ZoneInfo", boom)
+    with pytest.raises(RuntimeError):
+        format_cz(T0)
