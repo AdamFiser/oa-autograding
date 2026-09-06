@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -17,7 +18,6 @@ RELEASES = [
     {"tagName": "latest", "publishedAt": "2026-09-05T12:32:21Z"},
 ]
 URL_2 = f"https://github.com/{REPO}/releases/tag/submit%2F2026-09-05T12-32-05Z-a1b2c3d"
-URL_1 = f"https://github.com/{REPO}/releases/tag/submit%2F2026-09-05T12-10-00Z-9f8e7d6"
 RESULTS = {
     "submit/2026-09-05T12-32-05Z-a1b2c3d": {"datetime": "2026-09-05T12:32:05Z", "score": 3, "max-score": 4,
         "tests": [{"test-name": "A1 X", "passed": True}, {"test-name": "A2 Kotva", "passed": False}]},
@@ -56,6 +56,11 @@ class FakeGh:
         raise AssertionError(f"neočekávané volání gh {args}")
 
 
+def read_payload(call: list[str]) -> dict:
+    """Tělo komentáře z dočasného souboru, který dostalo `gh --input`."""
+    return json.loads(Path(call[call.index("--input") + 1]).read_text(encoding="utf-8"))
+
+
 def test_find_feedback_pr():
     assert fc.find_feedback_pr(FakeGh(prs=[9, 7]), REPO) == 7
     assert fc.find_feedback_pr(FakeGh(prs=[]), REPO) is None
@@ -91,7 +96,7 @@ def test_main_uses_github_server_url_from_env():
            "GITHUB_SERVER_URL": "https://ghe.skola.cz"}
     assert fc.main(gh, env) == 0
     patch = [c for c in gh.calls if "-X" in c][-1]
-    payload = json.loads(open(patch[patch.index("--input") + 1], encoding="utf-8").read())
+    payload = read_payload(patch)
     assert f"https://ghe.skola.cz/{REPO}/releases/tag/submit%2F" in payload["body"]
 
 
@@ -125,7 +130,7 @@ def test_main_happy_path(capsys):
     env = {"GITHUB_REPOSITORY": REPO, "GITHUB_SHA": SHA, "GITHUB_RUN_ID": "1"}
     assert fc.main(gh, env) == 0
     patch = [c for c in gh.calls if "-X" in c][-1]
-    payload = json.loads(open(patch[patch.index("--input") + 1], encoding="utf-8").read())
+    payload = read_payload(patch)
     assert payload["body"].startswith(MARKER) and "TĚLO" in payload["body"]
     assert "Historie odevzdání (2)" in payload["body"]
 
@@ -142,7 +147,7 @@ def test_main_no_release_posts_error_body():
     env = {"GITHUB_REPOSITORY": REPO, "GITHUB_SHA": SHA, "GITHUB_RUN_ID": "42"}
     assert fc.main(gh, env) == 0
     post = [c for c in gh.calls if "-X" in c][-1]
-    payload = json.loads(open(post[post.index("--input") + 1], encoding="utf-8").read())
+    payload = read_payload(post)
     assert "technické chybě" in payload["body"] and f"{REPO}/actions/runs/42" in payload["body"]
 
 
