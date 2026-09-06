@@ -13,7 +13,7 @@ authors = [{ name = "Adam Fišer" }]
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "tzdata; sys_platform == 'win32'"]
 
 [project.scripts]
 oa-check = "oa_autograding.cli:main"
