@@ -5,12 +5,13 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from oa_autograding.checks.base import CheckContext, CheckResult, register
+from oa_autograding.checks.base import CheckContext, CheckResult, register, strip_html_comments
 
 UL = r"^[-*+]\s+\S"
 OL = r"^\d+\.\s+\S"
-NESTED_UL = r"^[ \t]{2,}[-*+]\s+\S"
-NESTED_OL = r"^[ \t]{2,}\d+\.\s+\S"
+# Vnoření: dvě a více mezer, nebo jeden a více tabulátorů (GitHub tabulátor vykreslí jako vnoření).
+NESTED_UL = r"^(?: {2,}|\t+)[-*+]\s+\S"
+NESTED_OL = r"^(?: {2,}|\t+)\d+\.\s+\S"
 
 
 def find_headings(text: str) -> list[tuple[int, str]]:
@@ -34,8 +35,9 @@ def headings(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
     return CheckResult(True)
 
 
-_BOLD = r"\*\*[^\n*]+\*\*|__[^\n_]+__"
-_ITALIC = r"(?<!\*)\*(?!\*)[^\n*]+(?<!\*)\*(?!\*)|(?<!_)_(?!_)[^\n_]+(?<!_)_(?!_)"
+# Podtržítkové varianty jen na hranici slova — GFM `snake_case` uvnitř slova nevykreslí.
+_BOLD = r"\*\*[^\n*]+\*\*|(?<!\w)__[^\n_]+__(?!\w)"
+_ITALIC = r"(?<!\*)\*(?!\*)[^\n*]+(?<!\*)\*(?!\*)|(?<![\w_])_(?!_)[^\n_]+(?<!_)_(?!\w)"
 _STRIKE = r"~~[^\n~]+~~"
 
 
@@ -56,7 +58,7 @@ def formatting(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
 
 @register("md.anchor-link")
 def anchor_link(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
-    if re.search(r"\[[^\]]+\]\(#[^)]+\)", ctx.no_code):
+    if re.search(r"(?<!!)\[[^\]]+\]\(#[^)]+\)", ctx.no_code):
         return CheckResult(True)
     return CheckResult(False, "Nenašel se odkaz na sekci ve tvaru `[Text](#kotva)`; kotva je název nadpisu malými písmeny s pomlčkami.")
 
@@ -134,7 +136,7 @@ def find_code_blocks(text: str) -> list[tuple[str, str]]:
 def code(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
     missing: list[str] = []
     if p.get("block", True):
-        blocks = find_code_blocks(ctx.raw)
+        blocks = find_code_blocks(strip_html_comments(ctx.raw))
         langs = [str(l).strip().lower() for l in p.get("block_lang", [])]
         if not blocks:
             missing.append("blok kódu ohraničený trojicí zpětných apostrofů (```) na samostatných řádcích")
@@ -240,10 +242,16 @@ def checkboxes(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
 
 @register("md.hr")
 def hr(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
-    for line in ctx.no_code.splitlines():
+    lines = ctx.no_code.splitlines()
+    for idx, line in enumerate(lines):
         s = line.strip()
-        if re.fullmatch(r"-{3,}|\*{3,}|_{3,}", s):
-            return CheckResult(True)
+        if not re.fullmatch(r"-{3,}|\*{3,}|_{3,}", s):
+            continue
+        if idx and lines[idx - 1].strip():
+            continue  # podtržení nadpisu (setext), ne čára
+        if s[0] == "-" and idx == 0:
+            continue  # začátek YAML front matter, ne čára
+        return CheckResult(True)
     return CheckResult(False, "Nenašla se horizontální čára — `---` na samostatném řádku s prázdným řádkem nad sebou.")
 
 

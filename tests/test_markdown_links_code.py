@@ -17,6 +17,11 @@ def test_links_missing_reference_definition(repo):
     assert not res.passed and "reference" in res.reason
 
 
+def test_links_accept_image_inside_link(repo):
+    # `[![img](i.png)](url)` je platný odkaz s obrázkem, kontrola ho má uznat.
+    assert run(repo, "[![img](i.png)](https://a.cz) a [b][1]\n\n[1]: https://b.cz\n", "md.links").passed
+
+
 def test_links_ignore_images(repo):
     res = run(repo, "![a](x.png) ![b][1]\n\n[1]: y.png\n", "md.links")
     assert not res.passed and "inline" in res.reason
@@ -66,6 +71,11 @@ def test_code_missing_inline(repo):
 
 def test_code_no_block(repo):
     res = run(repo, "`x`", "md.code")
+    assert not res.passed and "blok" in res.reason
+
+
+def test_code_ignores_block_hidden_in_html_comment(repo):
+    res = run(repo, "<!--\n```bash\nls\n```\n-->\n`x`\n", "md.code")
     assert not res.passed and "blok" in res.reason
 
 

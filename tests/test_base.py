@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from oa_autograding.checks import base
-from oa_autograding.checks.base import CheckContext, CheckResult, strip_code_blocks
+from oa_autograding.checks.base import CheckContext, CheckResult, strip_code_blocks, strip_html_comments
 
 
 def test_strip_code_blocks_keeps_line_count():
@@ -25,6 +25,14 @@ def test_strip_html_comments_keeps_line_count():
     out = strip_code_blocks(text)
     assert "# ne nadpis" not in out
     assert "(#k)" not in out
+    assert out.count("\n") == text.count("\n")
+
+
+def test_strip_html_comments_alone_keeps_code_blocks():
+    text = "a\n<!-- skryto -->\n```bash\nls\n```\n"
+    out = strip_html_comments(text)
+    assert "skryto" not in out
+    assert "```bash" in out and "ls" in out
     assert out.count("\n") == text.count("\n")
 
 

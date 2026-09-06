@@ -55,6 +55,17 @@ def test_hr(repo):
     assert not res.passed and "---" in res.reason
 
 
+def test_hr_rejects_setext_underline(repo):
+    # `Nadpis\n---` GitHub vykreslí jako nadpis H2, ne jako čáru.
+    res = run(repo, "Nadpis\n---\n", "md.hr")
+    assert not res.passed and "---" in res.reason
+
+
+def test_hr_rejects_yaml_front_matter(repo):
+    res = run(repo, "---\ntitle: x\n---\n", "md.hr")
+    assert not res.passed
+
+
 def test_footnote(repo):
     assert run(repo, "Text[^1].\n\n[^1]: Poznámka.\n", "md.footnote").passed
     res = run(repo, "Text.\n\n[^1]: Poznámka.\n", "md.footnote")

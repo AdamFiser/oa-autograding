@@ -57,10 +57,37 @@ def test_formatting_pass_with_inline_code_present(repo):
     assert run(repo, "**t** *k* ~~p~~ plus `__init__`", "md.formatting").passed
 
 
+def test_formatting_ignores_snake_case_in_plain_text(repo):
+    # GFM podtržítka uvnitř slova nevykreslí, kontrola je nesmí brát jako formátování.
+    res = run(repo, "Soubor it_markdown_practice.md a metoda v tride. ~~p~~", "md.formatting")
+    assert not res.passed and "kurzíva" in res.reason and "tučný" in res.reason
+
+
+def test_formatting_counts_dunder_as_bold_like_github(repo):
+    # `__init__` obklopené mezerami GitHub podle CommonMark opravdu vykreslí tučně,
+    # takže se uznává; falešně pozitivní byla jen kurzíva ze snake_case uvnitř slova.
+    res = run(repo, "Soubor it_markdown_practice.md a metoda __init__ v tride.", "md.formatting")
+    assert not res.passed and "kurzíva" in res.reason and "tučný" not in res.reason
+
+
+def test_formatting_accepts_underscore_variants_on_word_boundary(repo):
+    assert run(repo, "Text _kurzíva_ a __tučně__ a ~~p~~ tady.", "md.formatting").passed
+
+
 def test_anchor_link(repo):
     assert run(repo, "[Sekce](#sekce)", "md.anchor-link").passed
     res = run(repo, "[Web](https://x.cz)", "md.anchor-link")
     assert not res.passed and "#kotva" in res.reason
+
+
+def test_anchor_link_rejects_image_with_anchor(repo):
+    # `![alt](#k)` je obrázek, ne odkaz na sekci.
+    res = run(repo, "![alt](#kotva)\n", "md.anchor-link")
+    assert not res.passed and "#kotva" in res.reason
+
+
+def test_anchor_link_accepts_normal_link_next_to_image(repo):
+    assert run(repo, "![alt](#kotva) a [Sekce](#sekce)\n", "md.anchor-link").passed
 
 
 def test_anchor_link_ignores_html_comment(repo):
@@ -83,6 +110,15 @@ def test_list_nested_any(repo):
     assert run(repo, "- a\n  - a1\n- b\n", "md.list", nested="any").passed
     res = run(repo, "- a\n- b\n", "md.list", nested="any")
     assert not res.passed and "vnořený" in res.reason
+
+
+def test_list_nested_any_accepts_tab_indent(repo):
+    # GitHub vykreslí jeden tabulátor jako vnoření, kontrola ho nesmí odmítnout.
+    assert run(repo, "- a\n\t- b\n", "md.list", nested="any").passed
+
+
+def test_list_nested_ordered_in_unordered_accepts_tab_indent(repo):
+    assert run(repo, "- a\n\t1. x\n", "md.list", nested="ordered-in-unordered").passed
 
 
 def test_list_nested_ordered_in_unordered(repo):

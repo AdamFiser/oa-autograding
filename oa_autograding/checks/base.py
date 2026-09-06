@@ -69,9 +69,14 @@ def registered_types() -> list[str]:
     return sorted(_REGISTRY)
 
 
+def strip_html_comments(text: str) -> str:
+    """Nahradí HTML komentáře prázdnými řádky (počet řádků zachová), fenced bloky nechá být.
+    Kontroly, které bloky kódu potřebují (md.code), tak nezapočítají blok schovaný v komentáři."""
+    return re.sub(r"<!--.*?-->", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
+
+
 def strip_code_blocks(text: str) -> str:
-    """Nahradí fenced bloky kódu a HTML komentáře prázdnými řádky (regexy pak nevidí falešné nadpisy
+    """Nahradí HTML komentáře i fenced bloky kódu prázdnými řádky (regexy pak nevidí falešné nadpisy
     ani příkladovou syntaxi schovanou v komentáři)."""
-    text = re.sub(r"```.*?```", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
-    text = re.sub(r"<!--.*?-->", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
-    return text
+    text = strip_html_comments(text)
+    return re.sub(r"```.*?```", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.DOTALL)
