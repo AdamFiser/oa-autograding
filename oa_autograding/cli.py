@@ -15,6 +15,10 @@ from oa_autograding.spec import SpecError, load_spec
 
 
 def main(argv: list[str] | None = None) -> int:
+    try:  # Windows konzole (cp1250) neumí ✅/❌ — bez přepnutí by výpis spadl
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError):
+        pass
     parser = argparse.ArgumentParser(prog="oa-check", description="Kontroly cvičení oa-autograding.")
     sub = parser.add_subparsers(dest="cmd", required=True)
     chk = sub.add_parser("check", help="Ohodnotí adresář podle checks.json a vypíše výsledek.")

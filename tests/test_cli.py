@@ -1,3 +1,4 @@
+import io
 import json
 
 import pytest
@@ -49,6 +50,20 @@ def test_check_invalid_spec(tmp_path, capsys):
     bad.write_text("{}", encoding="utf-8")
     assert main(["check", "--spec", str(bad), "--repo", str(tmp_path)]) == 2
     assert "schema" in capsys.readouterr().err
+
+
+def test_check_survives_cp1250_console(repo, tmp_path, monkeypatch):
+    """Windows konzole (cp1250) neumí ✅/❌; CLI si stdout přepne na UTF-8 místo pádu."""
+    import sys
+
+    repo.write("a.md", "x")
+    buf = io.BytesIO()
+    monkeypatch.setattr(sys, "stdout", io.TextIOWrapper(buf, encoding="cp1250"))
+    code = main(["check", "--spec", str(write_spec(tmp_path)), "--repo", str(repo.root)])
+    sys.stdout.flush()
+    assert code == 1
+    out = buf.getvalue()
+    assert "❌".encode("utf-8") in out or "✅".encode("utf-8") in out
 
 
 def test_types(capsys):
