@@ -1,0 +1,38 @@
+# oa-autograding shim pro classroom50.
+# Uloží se jako <trida>/autograders/oa.yaml v repu classroom50 dané organizace a
+# classroom50 ho zapíše doslovně do každého žákovského repa (assignment
+# registrovaný s --autograder oa). Nic se nedosazuje — org je zapsaná natvrdo.
+#
+# Rozdíly proti výchozímu shimu:
+#   • concurrency s rušením: rychlé pushe za sebou nespotřebují minuty navíc
+#   • job feedback: po hodnocení vloží/přepíše komentář ve Feedback PR
+
+name: Autograde
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["submit/*"]
+
+concurrency:
+  group: oa-autograde-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  grade:
+    uses: {{ORG}}/classroom50/.github/workflows/autograde-runner.yaml@main
+    permissions:
+      contents: write
+      statuses: write
+      pull-requests: write
+
+  feedback:
+    needs: grade
+    # Jen když runner skutečně hodnotil (přijímací commit a potlačené pushe status nenastaví).
+    if: always() && needs.grade.outputs.status != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: adamfiser/oa-autograding/.github/actions/feedback-comment@v1-rc
