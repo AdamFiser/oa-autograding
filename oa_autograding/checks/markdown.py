@@ -41,7 +41,7 @@ _STRIKE = r"~~[^\n~]+~~"
 
 @register("md.formatting")
 def formatting(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
-    t = ctx.no_code
+    t = re.sub(r"`[^`\n]+`", "", ctx.no_code)
     missing: list[str] = []
     if p.get("bold", True) and not re.search(_BOLD, t):
         missing.append("tučný text (`**text**`)")
@@ -94,20 +94,23 @@ def md_list(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
     return CheckResult(True)
 
 
-_REF_DEF = r"^\s*\[[^\]]+\]:\s*\S+"
+_REF_DEF = re.compile(r"^\s*\[([^\]]+)\]:\s*\S+", re.M)
 
 
 def _links_like(ctx: CheckContext, p: dict[str, Any], image: bool) -> CheckResult:
     t = ctx.no_code
     bang = "!" if image else "(?<!!)"
     inline_re = rf"{bang}\[[^\]]*\]\([^)]+\)" if image else rf"{bang}\[[^\]]+\]\([^)]+\)"
-    ref_re = rf"{bang}\[[^\]]*\]\[[^\]]+\]" if image else rf"{bang}\[[^\]]+\]\[[^\]]+\]"
+    ref_re = rf"{bang}\[[^\]]*\]\[([^\]]+)\]" if image else rf"{bang}\[[^\]]+\]\[([^\]]+)\]"
     co, inl, ref = ("obrázek", "![popis](url)", "![popis][id]") if image else ("odkaz", "[text](url)", "[text][id]")
     missing: list[str] = []
     if p.get("inline", True) and not re.search(inline_re, t):
         missing.append(f"inline {co} `{inl}`")
-    if p.get("reference", True) and not (re.search(ref_re, t) and re.search(_REF_DEF, t, re.M)):
-        missing.append(f"reference {co} `{ref}` s definicí `[id]: url` na samostatném řádku")
+    if p.get("reference", True):
+        referenced = {m.group(1).strip().lower() for m in re.finditer(ref_re, t)}
+        defined = {m.group(1).strip().lower() for m in _REF_DEF.finditer(t)}
+        if not (referenced & defined):
+            missing.append(f"reference {co} `{ref}` s definicí `[id]: url` na samostatném řádku (odkazované id nemá definici)")
     if missing:
         return CheckResult(False, "Chybí: " + ", ".join(missing) + ".")
     return CheckResult(True)
@@ -244,12 +247,20 @@ def hr(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
     return CheckResult(False, "Nenašla se horizontální čára — `---` na samostatném řádku s prázdným řádkem nad sebou.")
 
 
+_FOOTNOTE_DEF = re.compile(r"^\s*\[\^([^\]]+)\]:", re.M)
+
+
 @register("md.footnote")
 def footnote(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
-    refs = re.findall(r"\[\^[^\]]+\]", ctx.no_code)
-    defs = re.findall(r"^\s*\[\^[^\]]+\]:", ctx.no_code, re.M)
-    if not defs:
+    t = ctx.no_code
+    defined = {m.group(1).strip().lower() for m in _FOOTNOTE_DEF.finditer(t)}
+    if not defined:
         return CheckResult(False, "Chybí definice poznámky pod čarou ve tvaru `[^1]: text` na samostatném řádku.")
-    if len(refs) <= len(defs):
-        return CheckResult(False, "Chybí odkaz na poznámku v textu — za slovo napište `[^1]`.")
+    referenced: set[str] = set()
+    for line in t.splitlines():
+        if _FOOTNOTE_DEF.match(line):
+            continue
+        referenced.update(m.group(1).strip().lower() for m in re.finditer(r"\[\^([^\]]+)\]", line))
+    if not (referenced & defined):
+        return CheckResult(False, "Chybí odkaz na poznámku v textu — za slovo napište `[^1]` se stejným id jako u definice.")
     return CheckResult(True)

@@ -56,3 +56,12 @@ def test_footnote(repo):
     assert not res.passed and "odkaz" in res.reason
     res = run(repo, "Text[^1].\n", "md.footnote")
     assert not res.passed and "definice" in res.reason
+
+
+def test_footnote_id_mismatch(repo):
+    res = run(repo, "Text[^1].\n\n[^2]: Poznámka.\n", "md.footnote")
+    assert not res.passed and ("definice" in res.reason or "odkaz" in res.reason)
+
+
+def test_footnote_id_case_insensitive(repo):
+    assert run(repo, "Text[^a].\n\n[^A]: P.\n", "md.footnote").passed

@@ -48,6 +48,15 @@ def test_formatting_subset(repo):
     assert run(repo, "**t**", "md.formatting", italic=False, strikethrough=False).passed
 
 
+def test_formatting_ignores_inline_code(repo):
+    res = run(repo, "Metoda `__init__` a `moje_promenna_x` ~~p~~ *k*", "md.formatting")
+    assert not res.passed and "tučný" in res.reason
+
+
+def test_formatting_pass_with_inline_code_present(repo):
+    assert run(repo, "**t** *k* ~~p~~ plus `__init__`", "md.formatting").passed
+
+
 def test_anchor_link(repo):
     assert run(repo, "[Sekce](#sekce)", "md.anchor-link").passed
     res = run(repo, "[Web](https://x.cz)", "md.anchor-link")

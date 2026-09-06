@@ -32,6 +32,24 @@ def test_images_only_inline(repo):
     assert run(repo, "![a](x.png)", "md.images", reference=False).passed
 
 
+def test_links_reference_id_mismatch(repo):
+    res = run(repo, "[a](https://a.cz) [b][1]\n\n[2]: https://b.cz\n", "md.links")
+    assert not res.passed and "reference" in res.reason
+
+
+def test_links_reference_case_insensitive(repo):
+    assert run(repo, "[a](https://a.cz) [b][Wiki]\n\n[wiki]: https://b.cz\n", "md.links").passed
+
+
+def test_images_reference_id_mismatch(repo):
+    res = run(repo, "![a](x.png) ![b][1]\n\n[2]: y.png\n", "md.images")
+    assert not res.passed and "reference" in res.reason
+
+
+def test_images_reference_case_insensitive(repo):
+    assert run(repo, "![a](x.png) ![b][Logo]\n\n[logo]: y.png\n", "md.images").passed
+
+
 def test_code_pass(repo):
     assert run(repo, "```bash\nls\n```\ntext `x`\n", "md.code", block_lang=["bash", "sh"]).passed
 
