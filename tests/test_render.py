@@ -57,6 +57,26 @@ def test_release_body(repo):
     assert MARKER not in body
 
 
+def test_release_body_has_technical_details_block(repo, monkeypatch):
+    base.register("t.boom")(lambda c, p: CheckResult(False, "Nešlo to.", "RuntimeError: bum"))
+    repo.write("a.md", "x")
+    spec = parse_spec({"schema": "oa-autograding/checks/v1", "title": "Cvičení", "tasks": [
+        {"id": "a", "name": "Úkol A", "prefix": "A", "file": "a.md", "checks": [
+            {"id": "1", "description": "OK", "type": "t.ok"},
+            {"id": "2", "description": "Skript", "type": "t.boom"},
+        ]},
+    ]})
+    body = render_release_body(grade(spec, repo.root), GradeEnv("a1b2c3d", None, None, T0))
+    assert "<summary>Technické detaily</summary>" in body
+    assert "**A2:**" in body and "RuntimeError: bum" in body
+    assert body.index("Technické detaily") < body.index("<sub>")
+
+
+def test_release_body_without_details_has_no_block(repo):
+    body = render_release_body(report(repo), GradeEnv("a1b2c3d", None, None, T0))
+    assert "Technické detaily" not in body
+
+
 def test_release_body_missing_file(repo):
     body = render_release_body(report(repo, extra_b="chybi.md"), GradeEnv("a1b2c3d", None, None, T0))
     assert "### Úkol B · `chybi.md` · 0/1" in body

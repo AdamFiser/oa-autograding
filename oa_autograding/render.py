@@ -65,6 +65,18 @@ def _hint(report: GradeReport, t: TaskReport, idx: int) -> str:
     return _cell(" ".join(parts))
 
 
+def _details_block(report: GradeReport) -> list[str]:
+    """Technické detaily nesplněných kontrol (výjimky, výstup `run`) — sbalené na konci."""
+    items = [(o.check.label, o.details) for t in report.tasks for o in t.outcomes if not o.passed and o.details]
+    if not items:
+        return []
+    lines = ["<details>", "<summary>Technické detaily</summary>", ""]
+    for label, text in items:
+        lines += [f"- **{label}:**", "", "  ```", *[f"  {l}" for l in str(text).splitlines() or [""]], "  ```", ""]
+    lines += ["</details>", ""]
+    return lines
+
+
 def render_release_body(report: GradeReport, env: GradeEnv) -> str:
     lines = [f"**Automatická kontrola: {report.score} z {report.max_score} {of_word(report.max_score)}**", ""]
     sha7 = env.commit_sha[:7] or "?"
@@ -88,6 +100,7 @@ def render_release_body(report: GradeReport, env: GradeEnv) -> str:
                 napoveda = "" if o.passed else _hint(report, t, i)
                 lines.append(f"| {o.check.label} | {stav} | {_cell(o.check.description)} | {napoveda} |")
         lines.append("")
+    lines += _details_block(report)
     pata = "Dotazy k hodnocení pište sem do PR."
     if env.release_url:
         pata = f"Podrobnosti v [Release]({env.release_url}). " + pata
