@@ -179,3 +179,77 @@ def table(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
         return CheckResult(True)
     best = max(tables, key=lambda t: (t[0] >= min_cols, t[1]))
     return CheckResult(False, f"Největší tabulka má {best[0]} sloupce a {best[1]} datových řádků; požadováno alespoň {min_cols} sloupce a {min_rows} řádky (hlavička se nepočítá).")
+
+
+def _blockquote_groups(text: str) -> list[int]:
+    groups: list[int] = []
+    current = 0
+    for line in text.splitlines():
+        if re.match(r"^\s*>", line):
+            current += 1
+        else:
+            if current:
+                groups.append(current)
+            current = 0
+    if current:
+        groups.append(current)
+    return groups
+
+
+@register("md.blockquote")
+def blockquote(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    groups = _blockquote_groups(ctx.no_code)
+    if not groups:
+        return CheckResult(False, "Nenašla se citace — řádek začínající znakem `>`.")
+    missing: list[str] = []
+    if p.get("single", False) and not any(g == 1 for g in groups):
+        missing.append("jednořádková citace (jeden řádek `> text`)")
+    if p.get("multi", False) and not any(g >= 2 for g in groups):
+        missing.append("víceřádková citace (alespoň dva řádky za sebou začínající `>`)")
+    if missing:
+        return CheckResult(False, "Chybí: " + ", ".join(missing) + ".")
+    return CheckResult(True)
+
+
+@register("md.details")
+def details(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    t = ctx.raw.lower()
+    if "<details>" in t and "</details>" in t and "<summary>" in t:
+        return CheckResult(True)
+    return CheckResult(False, "Chybí sbalitelný blok `<details><summary>Nadpis</summary> obsah </details>` (včetně `<summary>`).")
+
+
+@register("md.checkboxes")
+def checkboxes(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    min_items = int(p.get("min_items", 1))
+    mixed = bool(p.get("mixed", True))
+    t = ctx.no_code
+    unchecked = re.findall(r"^\s*[-*+]\s+\[\s?\]\s+\S", t, re.M)
+    checked = re.findall(r"^\s*[-*+]\s+\[[xX]\]\s+\S", t, re.M)
+    total = len(unchecked) + len(checked)
+    if total < min_items:
+        return CheckResult(False, f"Nalezeno {total} položek se zaškrtávacím políčkem (`- [ ] text`), požadováno alespoň {min_items}.")
+    if mixed and not (unchecked and checked):
+        stav = "zaškrtnuté" if checked else "nezaškrtnuté"
+        return CheckResult(False, f"Všechny položky jsou {stav}; seznam má obsahovat oba stavy (`- [x]` i `- [ ]`).")
+    return CheckResult(True)
+
+
+@register("md.hr")
+def hr(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    for line in ctx.no_code.splitlines():
+        s = line.strip()
+        if re.fullmatch(r"-{3,}|\*{3,}|_{3,}", s):
+            return CheckResult(True)
+    return CheckResult(False, "Nenašla se horizontální čára — `---` na samostatném řádku s prázdným řádkem nad sebou.")
+
+
+@register("md.footnote")
+def footnote(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    refs = re.findall(r"\[\^[^\]]+\]", ctx.no_code)
+    defs = re.findall(r"^\s*\[\^[^\]]+\]:", ctx.no_code, re.M)
+    if not defs:
+        return CheckResult(False, "Chybí definice poznámky pod čarou ve tvaru `[^1]: text` na samostatném řádku.")
+    if len(refs) <= len(defs):
+        return CheckResult(False, "Chybí odkaz na poznámku v textu — za slovo napište `[^1]`.")
+    return CheckResult(True)
