@@ -37,7 +37,7 @@
         {"id": "footnote", "description": "Poznámka pod čarou (footnote)", "type": "md.footnote",
          "hint": "Za slovo napište `[^1]` a na konec souboru řádek `[^1]: text poznámky`."},
         {"id": "no-todo", "description": "V souboru nezůstala žádná značka `<!-- TODO -->`", "type": "file.no-marker", "marker": "<!-- TODO",
-         "hint": "Každou značku nahraďte skutečným obsahem podle jejího textu a značku smažte."}
+         "hint": "Značka říká, co na její místo patří; po doplnění ji smažte, jinak zůstane v odevzdání vidět."}
       ]
     },
     {

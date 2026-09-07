@@ -53,15 +53,54 @@ Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
 
 ## Nasazení do classroom50
 
-1. Do `ORG/classroom50` přidej `TRIDA/autograders/oa.yaml` (z `templates/shim.yaml`,
-   nahraď `{{ORG}}`) a `TRIDA/autograders/SLUG/{autograder.py,checks.json}`
-   (`autograder.py` z `templates/`). Commit + push do `main`; workflow
-   `Publish Pages` balík zveřejní (počítej s ~10 min zpožděním Pages).
-2. Zaregistruj zadání:
+Postup ověřený 2026-09-07 na pilotu `oa-pva` / `pva2-1sk-ctvrtek-2026-2027` /
+`10-markdown` (šablona `oa-scm-syllabus/scm_10_markdown`).
+
+**Předpoklady:** org s plánem Team/Enterprise (Pages na privátním repu
+`classroom50`; na plánu Free padá `Publish Pages` s HTTP 422), token `gh` se
+scopes `admin:org, read:org, repo, workflow` (`gh auth refresh -h github.com -s
+admin:org,read:org,repo,workflow`; nikdy `gh teacher login` — nahrazuje token),
+rozšíření `gh teacher` a `gh student`, šablona označená jako template.
+
+1. **Shim a bundle** — v klonu `ORG/classroom50`:
    ```bash
-   gh teacher assignment add ORG TRIDA SLUG --name "Název" --template OWNER/SABLONA --autograder oa
+   sed 's/{{ORG}}/ORG/g' templates/shim.yaml > TRIDA/autograders/oa.yaml
+   mkdir -p TRIDA/autograders/SLUG
+   cp templates/autograder.py TRIDA/autograders/SLUG/
+   cp cesta/k/checks.json    TRIDA/autograders/SLUG/
+   python -m oa_autograding check --spec TRIDA/autograders/SLUG/checks.json --repo vzorove-reseni
+   git add TRIDA/autograders && git commit -m "feat(TRIDA): shim oa a autograder pro SLUG" && git push
    ```
-3. Šablona zadání nemá obsahovat `.github/` — shim vzniká při přijetí.
+   Ne přes PowerShell 5.1 (`Get-Content`/`Set-Content` rozbijí UTF-8 a přidají BOM).
+   Workflow `Publish Pages` doběhne do ~30 s; ověř
+   `curl -sI https://ORG.github.io/classroom50/TRIDA/autograders/oa.yaml` a
+   `…/autograders/SLUG.tar.gz` → 200 (v pilotu do 1 min od pushe).
+2. **Registrace** (zamknuté, dokud není ověřeno):
+   ```bash
+   gh teacher assignment add ORG TRIDA SLUG --name "Název" --description "…" \
+     --template OWNER/SABLONA --autograder oa --locked
+   gh teacher autograder list ORG TRIDA        # očekávej oa.yaml + SLUG/
+   ```
+   `--autograder oa` vyžaduje, aby `TRIDA/autograders/oa.yaml` už bylo v repu.
+3. **Šablona** nesmí obsahovat `.github/` — shim vzniká při přijetí a `.github/`
+   šablony se přepisuje při každém `gh student submit`. Změnu šablony mergni
+   **před** zkouškou přijetí (accept kopíruje `main` šablony).
+4. **Zkouška naostro** pod vlastním účtem (musí být v rosteru třídy):
+   ```bash
+   gh teacher assignment lock ORG TRIDA SLUG --unlock   # odemknutí = klíč locked zmizí
+   gh student accept ORG TRIDA SLUG                     # repo ORG/TRIDA-SLUG-login + Feedback PR
+   gh teacher assignment lock ORG TRIDA SLUG
+   ```
+   Pushni kostru (má selhat) a vzorové řešení (má projít); po každém pushi do
+   ~1 min: workflow `Autograde` (joby `grade/*` a `feedback`), Release
+   `submit/<čas>-<sha7>`, stavy `classroom50/autograde` a
+   `classroom50/feedback-pr`, jeden přepisovaný komentář ve Feedback PR:
+   ```bash
+   gh api repos/ORG/REPO/issues/1/comments --jq '.[] | select(.body | contains("oa-autograding")) | .body'
+   ```
+   Dva pushe rychle za sebou: první běh `cancelled`, komentář patří poslednímu commitu.
+5. **Další třída se stejným cvičením:** `gh teacher assignment reuse` (stejná org)
+   a zkopírovat `TRIDA/autograders/oa.yaml` + `SLUG/` do adresáře druhé třídy.
 
 ## Vývoj
 
