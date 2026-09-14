@@ -51,6 +51,58 @@ oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
 
+## Postup pro tvořitele zadání (vzoru cvičení)
+
+Tahle sekce je pro toho, kdo píše nové cvičení (šablonu/vzor) a chce k němu
+`checks.json` — ne pro provoz už zavedeného cvičení (tam viz
+`oa-ccdev:classroom50-provoz`).
+
+1. **Připrav si dvě verze zadání vedle sebe:** kostru (co dostane žák,
+   bez řešení) a vzorové řešení (kostra + splněné požadavky). Bez obou nejde
+   `checks.json` ověřit — kostra musí u dotčených požadavků selhat, řešení musí
+   dát plný počet bodů. Repo `examples/` v tomhle projektu je vzor téhle
+   struktury:
+   ```
+   examples/scm_10_markdown/
+     kostra/           # co dostane žák
+     reseni/           # vzorové řešení
+     checks.json       # kontroly k tomuto cvičení
+   ```
+2. **Rozepiš požadavky, které se mají hodnotit,** do `tasks[].checks[]` (viz
+   formát výše). Jeden pedagogický požadavek = jedna kontrola: `id` (stabilní,
+   používá se v historii), `description` (žákovi, co se kontroluje),
+   `points`, `type` a parametry typu, `hint` (pevná nápověda, doplní se
+   konkrétním důvodem selhání). Typ vybírej z existujících:
+   ```bash
+   python -m oa_autograding types
+   ```
+   Parametry každého typu jsou v docstringu modulu `oa_autograding/checks/*.py`.
+   Chybí-li vhodný typ, nepiš `run` s regexem nad Markdownem/kódem žáka —
+   přidej nový typ do knihovny (viz „Vývoj" níž) a požádej o nový tag.
+3. **Ověř `checks.json` proti oběma verzím:**
+   ```bash
+   oa-check check --spec checks.json --repo examples/scm_10_markdown/kostra
+   oa-check check --spec checks.json --repo examples/scm_10_markdown/reseni
+   ```
+   Kostra musí u dotčených požadavků skončit nesplněním (exit 1), řešení musí
+   dát plný počet bodů (exit 0). Tohle je ten „test" k `checks.json` — žádný
+   jiný testovací soubor psát netřeba.
+4. **Kam `checks.json` uložit:** `checks.json` (spolu s kostrou/řešením jako
+   lokálním důkazem) drž ve svém pracovním repu — do repa se šablonou pro
+   žáky (`kostra/`) nepatří, žák ho nemá vidět. Finální umístění je bundle
+   v `classroom50`: `TRIDA/autograders/SLUG/checks.json`, viz „Nasazení do
+   classroom50" níž — tam ho nasazuje ten, kdo cvičení zavádí do classroom50
+   (skill `oa-ccdev:cviceni-autograding`).
+
+## Vývoj
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+Verze se pinuje tagem (`v1-rc`, `v1`, …). Změna kontroly u běžícího cvičení
+= nový tag, zvýšení `VERSION` ve stubu, regrade.
+
 ## Nasazení do classroom50
 
 Postup ověřený 2026-09-07 na pilotu `oa-pva` / `pva2-1sk-ctvrtek-2026-2027` /
@@ -101,12 +153,3 @@ rozšíření `gh teacher` a `gh student`, šablona označená jako template.
    Dva pushe rychle za sebou: první běh `cancelled`, komentář patří poslednímu commitu.
 5. **Další třída se stejným cvičením:** `gh teacher assignment reuse` (stejná org)
    a zkopírovat `TRIDA/autograders/oa.yaml` + `SLUG/` do adresáře druhé třídy.
-
-## Vývoj
-
-```bash
-pip install -e ".[dev]"
-pytest
-```
-Verze se pinuje tagem (`v1-rc`, `v1`, …). Změna kontroly u běžícího cvičení
-= nový tag, zvýšení `VERSION` ve stubu, regrade.
