@@ -94,6 +94,35 @@ Tahle sekce je pro toho, kdo píše nové cvičení (šablonu/vzor) a chce k ně
    classroom50" níž — tam ho nasazuje ten, kdo cvičení zavádí do classroom50
    (skill `oa-ccdev:cviceni-autograding`).
 
+### Cvičení, kde se nekontroluje Markdown, ale spouští program žáka
+
+Typy `md.*` čtou statický obsah souboru. Kde se má kontrolovat výstup
+spuštěného programu (PHP, Python, …), použij typ `run`
+(`oa_autograding/checks/run.py`) — spustí `cmd` v kořeni repa a porovná
+`stdout` (`comparison`: `included`/`exact`/`regex`) nebo `exit_code`. Žádný
+nový typ kontroly na to psát netřeba.
+
+Příklad — `examples/php_01_promenne/checks.json` (kostra i řešení ve stejném
+adresáři, ověřené `oa-check` proti oběma):
+
+```json
+{
+  "id": "hello", "description": "Vypíše „Ahoj, světe!“", "type": "run",
+  "cmd": "php 1_pozdrav.php", "expected": "Ahoj, světe!", "comparison": "included"
+}
+```
+
+- Víc úkolů v jednom souboru = víc checků se stejným `cmd` (výstup je
+  kumulativní) — `expected` u každého musí být substring/regex jedinečný pro
+  daný úkol.
+- Přesný formát (např. tabulátor, ne mezery) ověříš přes
+  `"comparison": "regex"`, např. `"expected": "\\t"`.
+- Úkoly typu „napište odpověď do komentáře“ (otevřená otázka, žádný
+  kontrolovatelný výstup) `run` nepokryje — necháš bez automatické kontroly,
+  hodnotí učitel ručně.
+- Runner classroom50 běží na `ubuntu-latest` — PHP i Python tam jsou
+  předinstalované, `cmd` nic navíc instalovat nemusí.
+
 ## Vývoj
 
 ```bash

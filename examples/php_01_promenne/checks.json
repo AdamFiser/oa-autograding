@@ -1,0 +1,25 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení PHP 01: Proměnné a výstup",
+  "tasks": [
+    {
+      "id": "pozdrav", "name": "Úkol 1 – Pozdrav", "prefix": "A", "file": "1_pozdrav.php",
+      "checks": [
+        {"id": "hello", "description": "Vypíše „Ahoj, světe!“", "type": "run",
+         "cmd": "php 1_pozdrav.php", "expected": "Ahoj, světe!", "comparison": "included",
+         "hint": "`echo 'Ahoj, světe!';`"},
+        {"id": "jmeno", "description": "Vypíše větu se jménem přes proměnnou", "type": "run",
+         "cmd": "php 1_pozdrav.php", "expected": "^Jmenuji se \\S+\\.$", "comparison": "regex",
+         "hint": "Jméno nepište do textu přímo, vypište ho přes proměnnou `$jmeno`."}
+      ]
+    },
+    {
+      "id": "soucet", "name": "Úkol 2 – Součet", "prefix": "B", "file": "2_soucet.php",
+      "checks": [
+        {"id": "vysledek", "description": "Vypíše součet ve tvaru „a + b = výsledek“", "type": "run",
+         "cmd": "php 2_soucet.php", "expected": "4 + 7 = 11", "comparison": "included",
+         "hint": "`echo $a . ' + ' . $b . ' = ' . ($a + $b);`"}
+      ]
+    }
+  ]
+}
