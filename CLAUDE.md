@@ -17,4 +17,5 @@ pip install -e ".[dev]"
 pytest
 ```
 
-Verze knihovny se pinuje tagem (`v1-rc`, `v1`, …).
+Verze knihovny se pinuje tagem v CalVer `RRRR.M.N` (`2026.9.0`, `2026.9.1`, `2026.10.0`, …);
+starší `v1-rc` zůstává pro běžící cvičení.
