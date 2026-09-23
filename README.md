@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@v1-rc
+pip install git+https://github.com/adamfiser/oa-autograding@2026.9.0
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -94,13 +94,65 @@ Tahle sekce je pro toho, kdo píše nové cvičení (šablonu/vzor) a chce k ně
    classroom50" níž — tam ho nasazuje ten, kdo cvičení zavádí do classroom50
    (skill `oa-ccdev:cviceni-autograding`).
 
+### Cvičení, kde se nekontroluje Markdown, ale spouští program žáka
+
+Typy `md.*` čtou statický obsah souboru. Kde se má kontrolovat výstup
+spuštěného programu (PHP, Python, …), použij typ `run`
+(`oa_autograding/checks/run.py`) — spustí `cmd` v kořeni repa a porovná
+`stdout` (`comparison`: `included`/`exact`/`regex`) nebo `exit_code`. Žádný
+nový typ kontroly na to psát netřeba.
+
+Příklad — `examples/php_01_promenne/checks.json` (kostra i řešení ve stejném
+adresáři, ověřené `oa-check` proti oběma):
+
+```json
+{
+  "id": "hello", "description": "Vypíše „Ahoj, světe!“", "type": "run",
+  "cmd": "php 1_pozdrav.php", "expected": "Ahoj, světe!", "comparison": "included"
+}
+```
+
+- Víc úkolů v jednom souboru = víc checků se stejným `cmd` (výstup je
+  kumulativní) — `expected` u každého musí být substring/regex jedinečný pro
+  daný úkol.
+- Přesný formát (např. tabulátor, ne mezery) ověříš přes
+  `"comparison": "regex"`, např. `"expected": "\\t"`.
+- Úkoly typu „napište odpověď do komentáře“ (otevřená otázka, žádný
+  kontrolovatelný výstup) `run` nepokryje — necháš bez automatické kontroly,
+  hodnotí učitel ručně.
+- Runner classroom50 běží na `ubuntu-latest` — PHP i Python tam jsou
+  předinstalované, `cmd` nic navíc instalovat nemusí.
+
+### Program v Pythonu: datové typy, funkce, techniky
+
+U Pythonu jde hodnotit víc než výstup. Typy `py.*` (`oa_autograding/checks/python.py`)
+pracují nad souborem z `file`:
+
+| Typ | Co ověří | Parametry |
+|---|---|---|
+| `py.eval` | hodnotu výrazu **včetně typu** (`"5"` ≠ `5`, `True` ≠ `1`; int/float zaměnitelné) | `expr`, `expected`, `timeout` |
+| `py.function` | že některá funkce ze souboru vrátí pro všechny vstupy očekávané hodnoty (název se neurčuje — hledá se chováním; slovník se zkusí předat i jako `f(**slovnik)`) | `cases: [{"args": [...], "expected": …}]`, `name`, `timeout` |
+| `py.uses` | statickou analýzou (AST), že kód používá aspoň jednu z konstrukcí | `any_of`: `for`, `while`, `def`, `fstring`, `comprehension`, `dict-lookup`, `in-collection`, `dict-get-default`, `default-param`, `sort-key` |
+| `file.contains` | že text (bez ohledu na mezery a velikost písmen) je aspoň na `min_count` řádcích — např. komentáře `# OPRAVA:` | `text`, `min_count` |
+
+`py.eval` a `py.function` vykonají program v podprocesu po příkazech nejvyšší
+úrovně: spadne-li výpis nad neopravenými daty, data a funkce se ohodnotí dál
+a žák dostane k důvodu i řádek pádu. Výstup programu se zahazuje, `input()`
+dostane prázdný vstup.
+
+Příklad — `examples/py_co_umim_z_pva1/checks.json` (šablona
+`oa-pva2-Syllabus/Py_CoUmimzPVA1`, 23 požadavků v blocích data / funkce /
+výstupy / techniky; kostra dá 1 bod, řešení 23).
+
 ## Vývoj
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
-Verze se pinuje tagem (`v1-rc`, `v1`, …). Změna kontroly u běžícího cvičení
+Verze se pinuje tagem v CalVer `RRRR.M.N` (první vydání v září 2026 = `2026.9.0`,
+druhé v září `2026.9.1`, první v říjnu `2026.10.0`); starší `v1-rc` zůstává
+pro běžící cvičení. Změna kontroly u běžícího cvičení
 = nový tag, zvýšení `VERSION` ve stubu, regrade.
 
 ## Nasazení do classroom50

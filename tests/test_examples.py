@@ -32,3 +32,18 @@ def test_reseni_passes_everything():
     rep = grade(load_spec(EX / "checks.json"), EX / "reseni")
     assert rep.passed, rep.failed_labels
     assert rep.score == rep.max_score == 27
+
+
+PY_EX = Path(__file__).resolve().parents[1] / "examples" / "py_co_umim_z_pva1"
+
+
+def test_py_kostra_fails_all_but_run():
+    rep = grade(load_spec(PY_EX / "checks.json"), PY_EX / "kostra")
+    # Kostra jsou jen data bez výpočtu, takže doběhne bez chyby (A1); vše ostatní chybí.
+    assert rep.score == 1 and "A1" not in rep.failed_labels
+
+
+def test_py_reseni_passes_everything():
+    rep = grade(load_spec(PY_EX / "checks.json"), PY_EX / "reseni")
+    assert rep.passed, rep.failed_labels
+    assert rep.score == rep.max_score == 23

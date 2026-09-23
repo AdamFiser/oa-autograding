@@ -56,3 +56,7 @@ def test_missing_cmd(repo):
 def test_bad_comparison(repo):
     with pytest.raises(ValueError):
         run(repo, cmd=f"{PY} -c \"print(1)\"", expected="1", comparison="zzz")
+
+
+def test_python_output_is_utf8(repo):
+    assert run(repo, cmd=f"{PY} -c \"print('šance')\"", expected="šance").passed

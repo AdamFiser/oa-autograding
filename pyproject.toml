@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oa-autograding"
-version = "1.0.0rc1"
+version = "2026.9.0"
 description = "Kontroly cvičení pro classroom50 (Markdown, Python, později PHP) s českou zpětnou vazbou pro žáky."
 readme = "README.md"
 requires-python = ">=3.12"

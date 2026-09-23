@@ -1,0 +1,100 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "PVA2: Co umím z PVA1 – hodnocení zakázky",
+  "tasks": [
+    {
+      "id": "data", "name": "Úkol 1 – Kontrola vstupních dat", "prefix": "A", "file": "reseni.py",
+      "checks": [
+        {"id": "bezi", "description": "Program doběhne bez chyby", "type": "run", "cmd": "python reseni.py",
+         "hint": "Spusťte `reseni.py` a opravte chybu, na které program skončí; řádek najdete v hlášce `Traceback`."},
+        {"id": "obrat-c", "description": "Obrat Firmy C je číslo", "type": "py.eval", "expr": "poptavka[2][\"obrat\"]", "expected": 5,
+         "hint": "Číslo se píše bez uvozovek: `5`, ne `\"5\"` (Datové typy)."},
+        {"id": "obrat-e", "description": "Obrat Firmy E je číslo", "type": "py.eval", "expr": "poptavka[4][\"obrat\"]", "expected": 20,
+         "hint": "Číslo se píše bez uvozovek (Datové typy)."},
+        {"id": "obrat-i", "description": "Obrat Firmy I je číslo", "type": "py.eval", "expr": "poptavka[8][\"obrat\"]", "expected": 100,
+         "hint": "Číslo se píše bez uvozovek (Datové typy)."},
+        {"id": "odvetvi-e", "description": "Odvětví Firmy E je bez překlepu", "type": "py.eval", "expr": "poptavka[4][\"odvetvi\"]", "expected": "automotive",
+         "hint": "Porovnejte hodnotu s tabulkou kritérií v zadání — text musí sedět písmeno po písmenu."},
+        {"id": "klic-o", "description": "Firma O má správné klíče (newsletter)", "type": "py.eval", "expr": "sorted(poptavka[14])",
+         "expected": ["konference", "nazev", "newsletter", "obrat", "odvetvi", "zeme"],
+         "hint": "Klíče slovníku musí mít všechny firmy stejné jako v tabulce kritérií (Slovníky)."},
+        {"id": "komentare", "description": "Alespoň 5 komentářů `# OPRAVA:`", "type": "file.contains", "text": "# OPRAVA:", "min_count": 5,
+         "hint": "Ke každé opravě napište na její řádek (nebo nad něj) `# OPRAVA: co jste změnili`."}
+      ]
+    },
+    {
+      "id": "body", "name": "Úkol 2 – Výpočet bodů", "prefix": "B", "file": "reseni.py",
+      "checks": [
+        {"id": "uplne", "description": "Funkce vrátí správné body (číslo) pro úplnou zakázku", "type": "py.function", "points": 2,
+         "cases": [
+           {"args": [{"nazev": "T1", "odvetvi": "automotive", "obrat": 50, "zeme": "CZ", "konference": true, "newsletter": true}], "expected": 10},
+           {"args": [{"nazev": "T2", "odvetvi": "retail", "obrat": 1500, "zeme": "FR", "konference": false, "newsletter": false}], "expected": 4},
+           {"args": [{"nazev": "T3", "odvetvi": "finance", "obrat": 200, "zeme": "PL", "konference": false, "newsletter": true}], "expected": 4},
+           {"args": [{"nazev": "T4", "odvetvi": "energy", "obrat": 5, "zeme": "DE", "konference": true, "newsletter": false}], "expected": 2}
+         ],
+         "hint": "Funkce dostane jednu zakázku (slovník) a body vrátí přes `return`, ne `print` (Funkce)."},
+        {"id": "hranice", "description": "Správné hranice obratu (10 a 1 000 včetně)", "type": "py.function",
+         "cases": [
+           {"args": [{"nazev": "T", "odvetvi": "retail", "obrat": 9, "zeme": "US", "konference": false, "newsletter": false}], "expected": 2},
+           {"args": [{"nazev": "T", "odvetvi": "retail", "obrat": 10, "zeme": "US", "konference": false, "newsletter": false}], "expected": 5},
+           {"args": [{"nazev": "T", "odvetvi": "retail", "obrat": 1000, "zeme": "US", "konference": false, "newsletter": false}], "expected": 5},
+           {"args": [{"nazev": "T", "odvetvi": "retail", "obrat": 1001, "zeme": "US", "konference": false, "newsletter": false}], "expected": 3}
+         ],
+         "hint": "„Od 10 do 1 000 včetně“ zapíšete `10 <= obrat <= 1000` (Podmínky)."},
+        {"id": "nepovinne", "description": "Bez konference a newsletteru se počítá s „ne“", "type": "py.function",
+         "cases": [
+           {"args": [{"nazev": "T", "odvetvi": "automotive", "obrat": 100, "zeme": "SK"}], "expected": 8},
+           {"args": [{"nazev": "T", "odvetvi": "retail", "obrat": 5, "zeme": "US"}], "expected": 2}
+         ],
+         "hint": "Chybějící klíč nesmí shodit program: `zakazka.get(\"klic\", False)` nebo parametr s výchozí hodnotou (Slovníky)."}
+      ]
+    },
+    {
+      "id": "sance", "name": "Úkol 3 – Určení šance", "prefix": "C", "file": "reseni.py",
+      "checks": [
+        {"id": "text", "description": "Funkce vrátí správný text šance i na hranicích pásem", "type": "py.function",
+         "cases": [
+           {"args": [0], "expected": "malá"}, {"args": [4], "expected": "malá"},
+           {"args": [5], "expected": "střední"}, {"args": [8], "expected": "střední"},
+           {"args": [9], "expected": "vysoká"}, {"args": [10], "expected": "vysoká"}
+         ],
+         "hint": "Funkce dostane počet bodů a vrátí přes `return` text `malá`, `střední` nebo `vysoká` (Podmínky)."}
+      ]
+    },
+    {
+      "id": "vystupy", "name": "Úkol 4 – Výstupy", "prefix": "D", "file": "reseni.py",
+      "checks": [
+        {"id": "firmy", "description": "Šance a body všech 15 firem v pořadí seznamu", "type": "run", "cmd": "python reseni.py", "points": 2,
+         "expected": "Firma A má šanci na získání zakázky: vysoká (body: 10)\nFirma B má šanci na získání zakázky: střední (body: 8)\nFirma C má šanci na získání zakázky: střední (body: 5)\nFirma D má šanci na získání zakázky: malá (body: 4)\nFirma E má šanci na získání zakázky: vysoká (body: 9)\nFirma F má šanci na získání zakázky: střední (body: 8)\nFirma G má šanci na získání zakázky: střední (body: 6)\nFirma H má šanci na získání zakázky: střední (body: 6)\nFirma I má šanci na získání zakázky: vysoká (body: 10)\nFirma J má šanci na získání zakázky: střední (body: 8)\nFirma K má šanci na získání zakázky: střední (body: 7)\nFirma L má šanci na získání zakázky: střední (body: 6)\nFirma M má šanci na získání zakázky: malá (body: 3)\nFirma N má šanci na získání zakázky: malá (body: 4)\nFirma O má šanci na získání zakázky: střední (body: 7)",
+         "hint": "Porovnejte výstup s Očekávaným výstupem v zadání; nesedí-li body, zkontrolujte nejdřív opravu dat (úkol 1)."},
+        {"id": "prumer", "description": "Průměrný počet bodů zaokrouhlený na 2 místa", "type": "run", "cmd": "python reseni.py",
+         "expected": "Průměrný počet bodů: 6.73",
+         "hint": "Průměr je součet děleno počet; zaokrouhlíte `round(x, 2)` (Čísla)."},
+        {"id": "nejvic", "description": "Všechny firmy s nejvyšším počtem bodů", "type": "run", "cmd": "python reseni.py",
+         "expected": "Firmy s nejvyšším počtem bodů: Firma A, Firma I",
+         "hint": "Nejdřív zjistěte maximum, pak vyberte všechny firmy s tímto počtem; spojíte je `\", \".join(seznam)` (Seznamy)."},
+        {"id": "top3", "description": "Tři nejlepší firmy sestupně, při shodě v pořadí seznamu", "type": "run", "cmd": "python reseni.py",
+         "expected": "Tři nejlepší firmy:\nFirma A má šanci na získání zakázky: vysoká (body: 10)\nFirma I má šanci na získání zakázky: vysoká (body: 10)\nFirma E má šanci na získání zakázky: vysoká (body: 9)",
+         "hint": "`sorted(…, key=…, reverse=True)` řadí stabilně — firmy se stejnými body zůstanou v původním pořadí (Seznamy)."},
+        {"id": "bonus", "description": "Bonus: počet firem podle šance", "type": "run", "cmd": "python reseni.py",
+         "expected": "Počet firem podle šance:\nmalá: 3\nstřední: 9\nvysoká: 3",
+         "hint": "Počty si držte ve slovníku `{\"malá\": 0, …}` a v cyklu přičítejte (Slovníky)."}
+      ]
+    },
+    {
+      "id": "techniky", "name": "Techniky a datové typy", "prefix": "E", "file": "reseni.py",
+      "checks": [
+        {"id": "for", "description": "Cyklus `for` přes seznam", "type": "py.uses", "any_of": ["for", "comprehension"],
+         "hint": "`for zakazka in poptavka:` (Cykly)."},
+        {"id": "struktura", "description": "Slovník nebo kolekce pro bodovací kritéria", "type": "py.uses", "any_of": ["dict-lookup", "in-collection"],
+         "hint": "Místo řady `if` stačí `{\"automotive\": 3, …}` nebo test `zeme in (\"CZ\", \"SK\")` (Slovníky)."},
+        {"id": "vychozi", "description": "Výchozí hodnota pro nepovinné údaje", "type": "py.uses", "any_of": ["dict-get-default", "default-param"],
+         "hint": "`zakazka.get(\"konference\", False)` nebo `def f(…, konference=False)` (Funkce)."},
+        {"id": "razeni", "description": "Řazení přes `sorted`/`sort` s parametrem `key`", "type": "py.uses", "any_of": ["sort-key"],
+         "hint": "`sorted(seznam, key=lambda x: …, reverse=True)` (Seznamy)."},
+        {"id": "fstring", "description": "f-string ve výstupu", "type": "py.uses", "any_of": ["fstring"],
+         "hint": "`print(f\"{nazev} má šanci …\")` (Řetězce)."}
+      ]
+    }
+  ]
+}
