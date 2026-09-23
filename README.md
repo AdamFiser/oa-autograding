@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@v1-rc
+pip install git+https://github.com/adamfiser/oa-autograding@2026.9.0
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -123,13 +123,36 @@ adresáři, ověřené `oa-check` proti oběma):
 - Runner classroom50 běží na `ubuntu-latest` — PHP i Python tam jsou
   předinstalované, `cmd` nic navíc instalovat nemusí.
 
+### Program v Pythonu: datové typy, funkce, techniky
+
+U Pythonu jde hodnotit víc než výstup. Typy `py.*` (`oa_autograding/checks/python.py`)
+pracují nad souborem z `file`:
+
+| Typ | Co ověří | Parametry |
+|---|---|---|
+| `py.eval` | hodnotu výrazu **včetně typu** (`"5"` ≠ `5`, `True` ≠ `1`; int/float zaměnitelné) | `expr`, `expected`, `timeout` |
+| `py.function` | že některá funkce ze souboru vrátí pro všechny vstupy očekávané hodnoty (název se neurčuje — hledá se chováním; slovník se zkusí předat i jako `f(**slovnik)`) | `cases: [{"args": [...], "expected": …}]`, `name`, `timeout` |
+| `py.uses` | statickou analýzou (AST), že kód používá aspoň jednu z konstrukcí | `any_of`: `for`, `while`, `def`, `fstring`, `comprehension`, `dict-lookup`, `in-collection`, `dict-get-default`, `default-param`, `sort-key` |
+| `file.contains` | že text (bez ohledu na mezery a velikost písmen) je aspoň na `min_count` řádcích — např. komentáře `# OPRAVA:` | `text`, `min_count` |
+
+`py.eval` a `py.function` vykonají program v podprocesu po příkazech nejvyšší
+úrovně: spadne-li výpis nad neopravenými daty, data a funkce se ohodnotí dál
+a žák dostane k důvodu i řádek pádu. Výstup programu se zahazuje, `input()`
+dostane prázdný vstup.
+
+Příklad — `examples/py_co_umim_z_pva1/checks.json` (šablona
+`oa-pva2-Syllabus/Py_CoUmimzPVA1`, 23 požadavků v blocích data / funkce /
+výstupy / techniky; kostra dá 1 bod, řešení 23).
+
 ## Vývoj
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
-Verze se pinuje tagem (`v1-rc`, `v1`, …). Změna kontroly u běžícího cvičení
+Verze se pinuje tagem v CalVer `RRRR.M.N` (první vydání v září 2026 = `2026.9.0`,
+druhé v září `2026.9.1`, první v říjnu `2026.10.0`); starší `v1-rc` zůstává
+pro běžící cvičení. Změna kontroly u běžícího cvičení
 = nový tag, zvýšení `VERSION` ve stubu, regrade.
 
 ## Nasazení do classroom50
