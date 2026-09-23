@@ -35,3 +35,17 @@ def file_no_marker(ctx: CheckContext, params: dict[str, Any]) -> CheckResult:
         False,
         f"V souboru zůstává {len(lines)}× značka `{marker}` (řádky {kde}). Každou nahraďte obsahem podle jejího textu.",
     )
+
+
+@register("file.contains")
+def file_contains(ctx: CheckContext, params: dict[str, Any]) -> CheckResult:
+    """Alespoň `min_count` (1) řádků obsahuje `text`; bez ohledu na mezery a velikost písmen."""
+    text = str(params.get("text", ""))
+    if not text:
+        return CheckResult(False, "Kontrola nemá zadaný `text` (chyba v checks.json).")
+    need = int(params.get("min_count", 1))
+    needle = text.replace(" ", "").casefold()
+    count = sum(needle in line.replace(" ", "").casefold() for line in ctx.raw.splitlines())
+    if count >= need:
+        return CheckResult(True)
+    return CheckResult(False, f"`{text}` je v souboru na {count} řádcích, požadováno alespoň {need}.")
