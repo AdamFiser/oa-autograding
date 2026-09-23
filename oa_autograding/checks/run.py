@@ -1,6 +1,7 @@
 """Kontrola `run`: spustí příkaz v kořeni repa a porovná výstup nebo návratový kód."""
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from typing import Any
@@ -30,6 +31,7 @@ def run_cmd(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
         proc = subprocess.run(
             cmd, shell=True, cwd=ctx.repo_root, input=p.get("stdin"),
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},  # Python na Windows by psal cp1250
         )
     except subprocess.TimeoutExpired:
         return CheckResult(False, f"Program neskončil do {timeout:g} s — nečeká někde na vstup nebo se nezacyklil?", f"$ {cmd}\n(timeout {timeout:g} s)")
