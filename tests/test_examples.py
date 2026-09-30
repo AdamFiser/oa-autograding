@@ -1,4 +1,7 @@
+import shutil
 from pathlib import Path
+
+import pytest
 
 from oa_autograding.grade import grade
 from oa_autograding.spec import load_spec
@@ -47,3 +50,23 @@ def test_py_reseni_passes_everything():
     rep = grade(load_spec(PY_EX / "checks.json"), PY_EX / "reseni")
     assert rep.passed, rep.failed_labels
     assert rep.score == rep.max_score == 23
+
+
+PHP_EX = Path(__file__).resolve().parents[1] / "examples" / "php_02_vystup_html"
+needs_php = pytest.mark.skipif(shutil.which("php") is None, reason="PHP není nainstalované")
+
+
+@needs_php
+def test_php_kostra_fails_all_but_no_warnings():
+    rep = grade(load_spec(PHP_EX / "checks.json"), PHP_EX / "kostra")
+    a, b = rep.tasks
+    # Kostra se vykreslí bez varování (A23); text zadání v HTML komentářích se nepočítá.
+    assert a.score == 1 and "A23" not in a.failed_labels
+    assert b.missing_file == "aboutme.php" and b.score == 0
+
+
+@needs_php
+def test_php_reseni_passes_everything():
+    rep = grade(load_spec(PHP_EX / "checks.json"), PHP_EX / "reseni")
+    assert rep.passed, rep.failed_labels
+    assert rep.score == rep.max_score == 37

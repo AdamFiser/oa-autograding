@@ -1,0 +1,318 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 02: PHP - Výstup a HTML",
+  "tasks": [
+    {
+      "id": "index",
+      "name": "Přehled – index.php (úkoly 1–13)",
+      "prefix": "A",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "title-php",
+          "description": "`<title>` už není statický text, vypisuje ho PHP",
+          "type": "file.no-marker",
+          "marker": "<title>Maturita</title>",
+          "hint": "Obsah `<title>` nahraďte příkazem `echo` nebo `print` s textem Maturita (úkol 2)."
+        },
+        {
+          "id": "description-php",
+          "description": "Meta description už není statický text, vypisuje ho PHP",
+          "type": "file.no-marker",
+          "marker": "content=\"Maturita - portal pro spravu maturitnich prací\"",
+          "hint": "Do uvozovek atributu `content` vložte PHP blok s `echo` (úkol 2)."
+        },
+        {
+          "id": "meta-author",
+          "description": "Meta author obsahuje hodnotu `$authorName`",
+          "type": "php.page",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "`content=\"…\"` vypíše proměnnou `$authorName` z PHP bloku na začátku souboru (úkol 3)."
+        },
+        {
+          "id": "odkaz-profil",
+          "description": "Odkaz v navigaci má text `Profil - <jméno>`",
+          "type": "php.page",
+          "expected": ">\\s*Profil - \\S[^<]*</a>",
+          "comparison": "regex",
+          "hint": "Text `'Profil - '` spojte tečkou s `$authorName` (úkol 4)."
+        },
+        {
+          "id": "h1-hello",
+          "description": "Nadpis H1 vypíše `Hello, world!`",
+          "type": "php.page",
+          "expected": "<h1[^>]*>\\s*Hello, world!\\s*</h1>",
+          "comparison": "regex",
+          "hint": "Statický text v `<h1>` nahraďte příkazem `echo` (úkol 5)."
+        },
+        {
+          "id": "karta-temata",
+          "description": "Karta Dostupná témata ukazuje hodnotu `$availableTopics`",
+          "type": "php.page",
+          "expected": "Dostupná témata</span>\\s*<h4[^>]*>\\s*[1-9]\\d*\\s*</h4>",
+          "comparison": "regex",
+          "hint": "Nulu v `<h4>` nahraďte výpisem `$availableTopics`, hodnota je kladné celé číslo (úkol 6)."
+        },
+        {
+          "id": "karta-konzultace",
+          "description": "Karta Moje konzultace ukazuje hodnotu `$myConsultations`",
+          "type": "php.page",
+          "expected": "Moje konzultace</span>\\s*<h4[^>]*>\\s*[1-9]\\d*\\s*</h4>",
+          "comparison": "regex",
+          "hint": "Nulu v `<h4>` nahraďte výpisem `$myConsultations`, hodnota je kladné celé číslo (úkol 6)."
+        },
+        {
+          "id": "tabulka-1",
+          "description": "Tabulka: 1. řádek s údaji 1. tématu",
+          "type": "php.page",
+          "expected": "<td[^>]*>\\s*Rezervační\\ systém\\ pro\\ autoškolu\\s*</td>\\s*<td[^>]*>\\s*Jan\\ Dvořák\\s*</td>\\s*<td[^>]*>\\s*2023\\s*</td>\\s*<td[^>]*>\\s*1\\s*</td>",
+          "comparison": "regex",
+          "hint": "Každá buňka vypíše jednu hodnotu z pole, např. `$topics[0]['author']`; `year` a `grade` jsou čísla bez uvozovek (úkol 7)."
+        },
+        {
+          "id": "tabulka-2",
+          "description": "Tabulka: 2. řádek s údaji 2. tématu",
+          "type": "php.page",
+          "expected": "<td[^>]*>\\s*Webová\\ galerie\\ školních\\ akcí\\s*</td>\\s*<td[^>]*>\\s*Eva\\ Malá\\s*</td>\\s*<td[^>]*>\\s*2024\\s*</td>\\s*<td[^>]*>\\s*2\\s*</td>",
+          "comparison": "regex",
+          "hint": "Každá buňka vypíše jednu hodnotu z pole, např. `$topics[1]['author']`; `year` a `grade` jsou čísla bez uvozovek (úkol 7)."
+        },
+        {
+          "id": "tabulka-3",
+          "description": "Tabulka: 3. řádek s údaji 3. tématu",
+          "type": "php.page",
+          "expected": "<td[^>]*>\\s*Evidence\\ výpůjček\\ ve\\ školní\\ knihovně\\s*</td>\\s*<td[^>]*>\\s*Petr\\ Šťastný\\s*</td>\\s*<td[^>]*>\\s*2025\\s*</td>\\s*<td[^>]*>\\s*1\\s*</td>",
+          "comparison": "regex",
+          "hint": "Každá buňka vypíše jednu hodnotu z pole, např. `$topics[2]['author']`; `year` a `grade` jsou čísla bez uvozovek (úkol 7)."
+        },
+        {
+          "id": "nejnovejsi",
+          "description": "Věta o nejnovějším tématu s rokem a autorem",
+          "type": "php.page",
+          "expected": "Evidence výpůjček ve školní knihovně (2025, Petr Šťastný)",
+          "hint": "Jeden řetězec ve dvojitých uvozovkách, hodnoty vložené jako `{$topics[2]['title']}` (úkol 8)."
+        },
+        {
+          "id": "delka-nazvu",
+          "description": "Délka názvu: `mb_strlen()` a v závorce `strlen()`",
+          "type": "php.page",
+          "expected": "36 znak\\w* \\(strlen: 42\\)",
+          "comparison": "regex",
+          "hint": "`mb_strlen()` počítá znaky, `strlen()` bajty; formát `36 znaků (strlen: 42)` (úkol 9)."
+        },
+        {
+          "id": "zkraceny-nazev",
+          "description": "Název zkrácený na 17 znaků funkcí `mb_substr()` a tři tečky",
+          "type": "php.page",
+          "expected": "Evidence výpůjček...",
+          "hint": "`mb_substr($topics[2]['title'], 0, 17) . '...'` — `substr()` rozpůlí znak s diakritikou (úkol 9)."
+        },
+        {
+          "id": "autor-velkymi",
+          "description": "Jméno autora velkými písmeny přes `mb_strtoupper()`",
+          "type": "php.page",
+          "expected": "PETR ŠŤASTNÝ",
+          "hint": "`strtoupper()` diakritiku nepřevede, použijte `mb_strtoupper()` (úkol 9)."
+        },
+        {
+          "id": "prumer",
+          "description": "Průměrná známka zaokrouhlená na dvě desetinná místa",
+          "type": "php.page",
+          "expected": "(?<![\\d.])1\\.33(?!\\d)",
+          "comparison": "regex",
+          "hint": "Součet tří hodnot `grade` v závorce vydělte třemi a vypište přes `round($averageGrade, 2)` (úkol 10)."
+        },
+        {
+          "id": "hledani-trim",
+          "description": "Hledaný text z adresy je oříznutý a v `<strong>`",
+          "type": "php.page",
+          "expected": "<strong>auto</strong>",
+          "query": {
+            "hledat": "  auto  "
+          },
+          "hint": "`$searchQuery = trim($_GET['hledat'] ?? '');` a výpis uvnitř `<strong>` (úkol 11)."
+        },
+        {
+          "id": "hledani-nalezeno",
+          "description": "Pro hledaný text `auto` vypíše 1",
+          "type": "php.page",
+          "expected": "text:\\s*1\\s*<",
+          "comparison": "regex",
+          "query": {
+            "hledat": "auto"
+          },
+          "hint": "Výsledek `str_contains()` přetypujte `(int)`, jinak se `true` vypíše jako 1, ale `false` jako nic (úkol 11)."
+        },
+        {
+          "id": "hledani-nenalezeno",
+          "description": "Pro hledaný text `web` vypíše 0",
+          "type": "php.page",
+          "expected": "text:\\s*0\\s*<",
+          "comparison": "regex",
+          "query": {
+            "hledat": "web"
+          },
+          "hint": "`false` se bez přetypování `(int)` vypíše jako prázdný řetězec (úkol 11)."
+        },
+        {
+          "id": "hledani-escape",
+          "description": "Hledaný text se vypíše přes `htmlspecialchars()`",
+          "type": "php.page",
+          "expected": "<strong>&lt;i&gt;ahoj&lt;/i&gt;</strong>",
+          "query": {
+            "hledat": "<i>ahoj</i>"
+          },
+          "hint": "Text z adresy obalte `htmlspecialchars()`, jinak ho prohlížeč vykreslí jako HTML (úkol 11)."
+        },
+        {
+          "id": "var-dump",
+          "description": "Ladicí panel: `var_dump()` všech šesti hodnot v zadaném pořadí",
+          "type": "php.page",
+          "expected": "int\\(\\d+\\)[\\s\\S]{0,200}?(float|double)\\(1\\.33\\d*\\)[\\s\\S]{0,200}?string\\(35\\) \"Rezervační systém pro autoškolu\"[\\s\\S]{0,200}?bool\\(true\\)[\\s\\S]{0,200}?NULL[\\s\\S]{0,200}?array\\(4\\)[\\s\\S]{0,400}?int\\(2024\\)[\\s\\S]{0,100}?int\\(2\\)",
+          "comparison": "regex",
+          "hint": "Do `<pre>` jeden `var_dump()` s hodnotami v pořadí ze zadání; `year` a `grade` jsou čísla bez uvozovek, `$isRegistrationOpen` a `$supervisorName` deklarujte nahoře (úkol 12)."
+        },
+        {
+          "id": "echo-bool-null",
+          "description": "Obyčejný výpis `true` a `null` pod panelem",
+          "type": "php.page",
+          "expected": "otev\\w*:\\s*1\\s*</p>\\s*<p[^>]*>[^<:]*:\\s*</p>",
+          "comparison": "regex",
+          "hint": "Za dvojtečky vypište `$isRegistrationOpen` a `$supervisorName` přes `echo`, pomlčky smažte (úkol 12)."
+        },
+        {
+          "id": "paticka",
+          "description": "Patička `Maturita v1.0` z konstanty `APP_VERSION`",
+          "type": "php.page",
+          "expected": "Maturita v1\\.0\\s*</footer>",
+          "comparison": "regex",
+          "hint": "`const APP_VERSION = \"1.0\";` nahoře a v patičce `echo APP_VERSION;` bez `$` (úkol 13)."
+        },
+        {
+          "id": "bez-varovani",
+          "description": "Stránka se vykreslí bez chyb a varování PHP",
+          "type": "php.page",
+          "no_warnings": true,
+          "hint": "Varování `Undefined variable` znamená proměnnou, kterou nahoře nedeklarujete, nebo překlep v názvu."
+        }
+      ]
+    },
+    {
+      "id": "aboutme",
+      "name": "Profil – aboutme.php (úkoly 14–20)",
+      "prefix": "B",
+      "file": "aboutme.php",
+      "checks": [
+        {
+          "id": "soubor",
+          "description": "Soubor `aboutme.php` existuje",
+          "type": "file.exists",
+          "hint": "Zkopírujte `index.php` a kopii uložte jako `aboutme.php` (úkol 14)."
+        },
+        {
+          "id": "bez-sekce-index",
+          "description": "V `aboutme.php` už není sekce jen pro index.php",
+          "type": "file.no-marker",
+          "marker": "SEKCE JEN PRO index.php",
+          "hint": "Smažte blok od značky `SEKCE JEN PRO index.php` až po `KONEC SEKCE` (úkol 14)."
+        },
+        {
+          "id": "bez-sekce-aboutme",
+          "description": "V `index.php` už není sekce jen pro aboutme.php",
+          "type": "file.no-marker",
+          "file": "index.php",
+          "marker": "SEKCE JEN PRO aboutme.php",
+          "hint": "Smažte blok od značky `SEKCE JEN PRO aboutme.php` až po `KONEC SEKCE` (úkol 14)."
+        },
+        {
+          "id": "odkazy-index",
+          "description": "V `index.php` vedou odkazy na `index.php` a `aboutme.php`",
+          "type": "php.page",
+          "expected": "<a href=\"index\\.php\"[^>]*>\\s*Přehled\\s*</a>\\s*<a href=\"aboutme\\.php\"",
+          "comparison": "regex",
+          "file": "index.php",
+          "hint": "`href=\"#\"` nahraďte názvem souboru, na který odkaz vede (úkol 15)."
+        },
+        {
+          "id": "odkazy-aboutme",
+          "description": "V `aboutme.php` vedou odkazy na `index.php` a `aboutme.php`",
+          "type": "php.page",
+          "expected": "<a href=\"index\\.php\"[^>]*>\\s*Přehled\\s*</a>\\s*<a href=\"aboutme\\.php\"",
+          "comparison": "regex",
+          "hint": "Odkazy upravte stejně jako v `index.php` (úkol 15)."
+        },
+        {
+          "id": "h1-profil",
+          "description": "Nadpis H1 vypíše `Profil - <jméno>`",
+          "type": "php.page",
+          "expected": "<h1[^>]*>\\s*Profil - \\S[^<]*</h1>",
+          "comparison": "regex",
+          "hint": "`'Profil - '` spojené tečkou s `$authorName`, stejně jako odkaz v navigaci (úkol 16)."
+        },
+        {
+          "id": "tema-radek",
+          "description": "Řádek `Tema: … | Konzultace: … | Stav: …`",
+          "type": "php.page",
+          "expected": "Tema: \\S[^|<]*\\| Konzultace: \\S[^|<]*\\| Stav: \\S[^<]*",
+          "comparison": "regex",
+          "hint": "Tři proměnné na jednom řádku přesně ve formátu ze zadání, oddělené ` | ` (úkol 17)."
+        },
+        {
+          "id": "postup-text",
+          "description": "Text postupu konzultací `N z 3 (P %)`",
+          "type": "php.page",
+          "expected": "\\d+ z 3 \\(\\d+ %\\)",
+          "comparison": "regex",
+          "hint": "`const REQUIRED_CONSULTATIONS = 3;` a `$consultationProgress` přetypované `(int)` (úkol 18)."
+        },
+        {
+          "id": "postup-sirka",
+          "description": "Šířka ukazatele `style=\"width: P%\"` odpovídá procentům v textu",
+          "type": "php.page",
+          "expected": "z 3 \\((\\d+) %\\)</span>[\\s\\S]{0,400}?style=\"width: \\1%\"",
+          "comparison": "regex",
+          "hint": "Nulu v atributu `style` nahraďte výpisem `$consultationProgress` (úkol 18)."
+        },
+        {
+          "id": "mailto",
+          "description": "Odkaz `mailto:` s e-mailem vedoucí práce",
+          "type": "php.page",
+          "expected": "href=\"mailto:horakova@skola\\.cz\"[^>]*>\\s*horakova@skola\\.cz\\s*</a>",
+          "comparison": "regex",
+          "hint": "V heredocu hodnota z pole jako `{$supervisor['email']}`, i uvnitř atributu `href` (úkol 19)."
+        },
+        {
+          "id": "kabinet-telefon",
+          "description": "Kabinet `B204` a `Telefon: neuvedeno`",
+          "type": "php.page",
+          "expected": "Kabinet: B204[\\s\\S]{0,200}?Telefon: neuvedeno",
+          "comparison": "regex",
+          "hint": "`$supervisorPhone = $supervisor['phone'] ?? 'neuvedeno';` a do heredocu `$supervisorPhone` (úkol 19)."
+        },
+        {
+          "id": "heredoc",
+          "description": "Karta vedoucí je vypsaná heredocem",
+          "type": "file.contains",
+          "text": "echo <<<",
+          "hint": "`echo <<<HTML` na začátku a samostatný řádek `HTML;` na konci (úkol 19)."
+        },
+        {
+          "id": "zprava",
+          "description": "Bonus: zpráva ze šablony s `<br>` a jménem vedoucí",
+          "type": "php.page",
+          "expected": "Dobry den, [^<,]+,<br>vase tema [^<]+ bylo prijato k posouzeni\\.<br>S pozdravem, Mgr\\. Jana Horáková",
+          "comparison": "regex",
+          "hint": "Tři `str_replace()` pro zástupné texty a čtvrtý nahradí `\"\\n\"` za `<br>` (úkol 20)."
+        },
+        {
+          "id": "bez-varovani",
+          "description": "Stránka se vykreslí bez chyb a varování PHP",
+          "type": "php.page",
+          "no_warnings": true,
+          "hint": "Varování `Undefined variable` znamená proměnnou, kterou nahoře nedeklarujete, nebo překlep v názvu."
+        }
+      ]
+    }
+  ]
+}
