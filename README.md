@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.9.0
+pip install git+https://github.com/adamfiser/oa-autograding@2026.9.1
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -122,6 +122,30 @@ adresáři, ověřené `oa-check` proti oběma):
   hodnotí učitel ručně.
 - Runner classroom50 běží na `ubuntu-latest` — PHP i Python tam jsou
   předinstalované, `cmd` nic navíc instalovat nemusí.
+
+### PHP stránka kombinovaná s HTML
+
+Když žák píše PHP přímo do HTML stránky (`index.php` se zadáním v HTML
+komentářích), `run` nestačí: surový výstup obsahuje i komentáře se zadáním
+a „Očekávaným výstupem“, takže by kontrola prošla už na kostře. Typ
+`php.page` (`oa_autograding/checks/php.py`) stránku z `file` vykreslí přes
+PHP CLI, **HTML komentáře z výstupu odstraní** a teprve pak porovná.
+
+| Parametr | Význam |
+|---|---|
+| `expected`, `comparison` | text (`included`, výchozí) nebo `regex`; bez `expected` stačí, že se stránka vykreslí |
+| `query` | slovník pro `$_GET`, např. `{"hledat": "  auto  "}` — simuluje `index.php?hledat=…` |
+| `no_warnings` | `true` = neprojde stránka, ve které PHP hlásí chybu, varování, upozornění nebo deprecated |
+| `timeout` | limit v sekundách (výchozí `10`) |
+
+Chyby PHP jdou mimo výstup stránky (na stderr), takže varování samo nerozbije
+porovnání obsahu — hlídá ho samostatný požadavek s `no_warnings`. Stránka,
+která skončí fatální chybou nebo chybou syntaxe, neprojde nikdy a žák dostane
+první řádek chyby.
+
+Příklad — `examples/php_02_vystup_html/checks.json` (šablona
+`oa-pva4-Syllabus/PHP_02_VystupHtml`, 37 požadavků ve dvou blocích
+`index.php` / `aboutme.php`; kostra dá 1 bod, řešení 37).
 
 ### Program v Pythonu: datové typy, funkce, techniky
 
