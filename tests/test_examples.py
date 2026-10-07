@@ -70,3 +70,22 @@ def test_php_reseni_passes_everything():
     rep = grade(load_spec(PHP_EX / "checks.json"), PHP_EX / "reseni")
     assert rep.passed, rep.failed_labels
     assert rep.score == rep.max_score == 37
+
+
+PHP06_EX = Path(__file__).resolve().parents[1] / "examples" / "php_06_include_require"
+
+
+@needs_php
+def test_php06_kostra_passes_only_regression_guards():
+    rep = grade(load_spec(PHP06_EX / "checks.json"), PHP06_EX / "kostra")
+    # Kostra se vykreslí bez varování a s kartami (C5, C6, D4); vše, co vyžaduje rozdělení do souborů, chybí.
+    labels = {c.label for t in rep.tasks for c in t.task.checks}
+    assert labels - set(rep.failed_labels) == {"C5", "C6", "D4"}
+    assert rep.score == 3
+
+
+@needs_php
+def test_php06_reseni_passes_everything():
+    rep = grade(load_spec(PHP06_EX / "checks.json"), PHP06_EX / "reseni")
+    assert rep.passed, rep.failed_labels
+    assert rep.score == rep.max_score == 35
