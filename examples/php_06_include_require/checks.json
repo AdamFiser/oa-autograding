@@ -1,0 +1,316 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 06: PHP - Příkazy include a require",
+  "tasks": [
+    {
+      "id": "config",
+      "name": "Konfigurace – includes/config.php (úkol 1)",
+      "prefix": "A",
+      "file": "includes/config.php",
+      "checks": [
+        {
+          "id": "config-exists",
+          "description": "Soubor `includes/config.php` existuje",
+          "type": "file.exists",
+          "hint": "Složka `includes` v kořeni projektu, v ní soubor `config.php` — název přesně malými písmeny (úkol 1)."
+        },
+        {
+          "id": "config-return",
+          "description": "Konfigurace vrací pole příkazem `return`",
+          "type": "file.contains",
+          "text": "return [",
+          "hint": "Soubor obsahuje `return [ 'klic' => hodnota, … ];` (kapitola Vložený soubor může vrátit hodnotu)."
+        },
+        {
+          "id": "config-no-close",
+          "description": "`config.php` není ukončený značkou `?>`",
+          "type": "file.no-marker",
+          "marker": "?>",
+          "hint": "Soubor obsahuje jen PHP kód, uzavírací značku na konci smažte (kapitola Uzavírací značka)."
+        },
+        {
+          "id": "index-require",
+          "description": "`index.php` načítá konfiguraci přes `require __DIR__`",
+          "type": "file.contains",
+          "file": "index.php",
+          "text": "require __DIR__",
+          "hint": "`$config = require __DIR__ . '/includes/config.php';` na začátku PHP bloku (úkol 1)."
+        },
+        {
+          "id": "aboutme-require",
+          "description": "`aboutme.php` načítá konfiguraci přes `require __DIR__`",
+          "type": "file.contains",
+          "file": "aboutme.php",
+          "text": "require __DIR__",
+          "hint": "`$config = require __DIR__ . '/includes/config.php';` na začátku PHP bloku (úkol 1)."
+        },
+        {
+          "id": "index-no-const",
+          "description": "`index.php` už nedeklaruje `APP_VERSION`",
+          "type": "file.no-marker",
+          "file": "index.php",
+          "marker": "const APP_VERSION",
+          "hint": "Verze je v konfiguraci, vypisujte `$config['version']` (úkol 1)."
+        },
+        {
+          "id": "aboutme-no-const",
+          "description": "`aboutme.php` už nedeklaruje `APP_VERSION`",
+          "type": "file.no-marker",
+          "file": "aboutme.php",
+          "marker": "const APP_VERSION",
+          "hint": "Verze je v konfiguraci, vypisujte `$config['version']` (úkol 1)."
+        },
+        {
+          "id": "meta-author",
+          "description": "Meta author vypisuje jméno z konfigurace",
+          "type": "php.page",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "`content=\"…\"` vypíše `$config['author']` a v `config.php` je vaše jméno (úkol 1).",
+          "file": "index.php"
+        }
+      ]
+    },
+    {
+      "id": "sablony",
+      "name": "Šablony – header, menu, footer (úkoly 2–4)",
+      "prefix": "B",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "header-doctype",
+          "description": "`templates/header.php` obsahuje začátek stránky",
+          "type": "file.contains",
+          "file": "templates/header.php",
+          "text": "<!doctype html>",
+          "hint": "Do šablony patří vše od `<!doctype html>` po otevírací `<div class=\"mx-auto max-w-3xl\">` (úkol 2)."
+        },
+        {
+          "id": "header-menu",
+          "description": "`header.php` vkládá menu přes `include __DIR__`",
+          "type": "file.contains",
+          "file": "templates/header.php",
+          "text": "include __DIR__",
+          "hint": "`<?php include __DIR__ . '/menu.php'; ?>` na místě odkazů navigace (úkol 3)."
+        },
+        {
+          "id": "footer-html",
+          "description": "`templates/footer.php` obsahuje konec stránky",
+          "type": "file.contains",
+          "file": "templates/footer.php",
+          "text": "</html>",
+          "hint": "Co hlavička otevře, patička zavře — až po `</html>` (úkol 4)."
+        },
+        {
+          "id": "title-index",
+          "description": "`index.php` nastavuje `$pageTitle` pro hlavičku",
+          "type": "file.contains",
+          "text": "$pageTitle =",
+          "hint": "Před `include` hlavičky napište `$pageTitle = 'Přehled';` (úkol 2)."
+        },
+        {
+          "id": "title-aboutme",
+          "description": "`aboutme.php` nastavuje `$pageTitle` pro hlavičku",
+          "type": "file.contains",
+          "file": "aboutme.php",
+          "text": "$pageTitle =",
+          "hint": "Před `include` hlavičky napište `$pageTitle = 'Profil';` (úkol 2)."
+        },
+        {
+          "id": "title-header",
+          "description": "`header.php` používá `$pageTitle`",
+          "type": "file.contains",
+          "file": "templates/header.php",
+          "text": "$pageTitle",
+          "hint": "Obsah `<title>` nahraďte výpisem `$pageTitle` a `$config['appName']` (úkol 2)."
+        },
+        {
+          "id": "menu-active",
+          "description": "`menu.php` zvýrazňuje aktivní stránku podle `$activePage`",
+          "type": "file.contains",
+          "file": "templates/menu.php",
+          "text": "$activePage ===",
+          "min_count": 2,
+          "hint": "Každý odkaz má třídu vypsanou ternárním zápisem ze zadání, porovnává `$activePage` (úkol 3)."
+        },
+        {
+          "id": "menu-profil",
+          "description": "Odkaz v menu má text `Profil - <jméno>`",
+          "type": "php.page",
+          "expected": ">\\s*Profil - (?!yourName)\\S[^<]*</a>",
+          "comparison": "regex",
+          "hint": "Text `Profil - ` a za ním výpis `$config['author']` (úkol 3)."
+        },
+        {
+          "id": "footer-text",
+          "description": "Patička vypisuje `© 2026 Maturita v1.1 · maturita@oa-opava.cz`",
+          "type": "php.page",
+          "expected": "(&copy;|©)\\s*2026\\s+Maturita\\s+v1\\.1\\s*·\\s*maturita@oa-opava\\.cz",
+          "comparison": "regex",
+          "hint": "Rok, název, verzi i e-mail vypište z `$config`, znak © zapište jako `&copy;` (úkol 4)."
+        }
+      ]
+    },
+    {
+      "id": "uklid",
+      "name": "Úklid stránek (úkol 5)",
+      "prefix": "C",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "index-no-head",
+          "description": "`index.php` neobsahuje `<head>`",
+          "type": "file.no-marker",
+          "marker": "<head>",
+          "hint": "Hlavičku vkládá `include` šablony `header.php` (úkol 5)."
+        },
+        {
+          "id": "index-no-footer",
+          "description": "`index.php` neobsahuje `<footer>`",
+          "type": "file.no-marker",
+          "marker": "<footer",
+          "hint": "Patičku vkládá `include` šablony `footer.php` (úkol 5)."
+        },
+        {
+          "id": "aboutme-no-head",
+          "description": "`aboutme.php` neobsahuje `<head>`",
+          "type": "file.no-marker",
+          "file": "aboutme.php",
+          "marker": "<head>",
+          "hint": "Hlavičku vkládá `include` šablony `header.php` (úkol 5)."
+        },
+        {
+          "id": "aboutme-no-footer",
+          "description": "`aboutme.php` neobsahuje `<footer>`",
+          "type": "file.no-marker",
+          "file": "aboutme.php",
+          "marker": "<footer",
+          "hint": "Patičku vkládá `include` šablony `footer.php` (úkol 5)."
+        },
+        {
+          "id": "index-warnings",
+          "description": "`index.php` se vykreslí bez varování PHP",
+          "type": "php.page",
+          "no_warnings": true,
+          "hint": "Hláška říká soubor a řádek; nejčastěji jde o proměnnou nastavenou až po `include` nebo o překlep v cestě (kapitola Časté chyby)."
+        },
+        {
+          "id": "aboutme-warnings",
+          "description": "`aboutme.php` se vykreslí bez varování PHP",
+          "type": "php.page",
+          "no_warnings": true,
+          "file": "aboutme.php",
+          "hint": "Hláška říká soubor a řádek; nejčastěji jde o proměnnou nastavenou až po `include` nebo o překlep v cestě (kapitola Časté chyby)."
+        }
+      ]
+    },
+    {
+      "id": "karta",
+      "name": "Metriková karta (úkol 6)",
+      "prefix": "D",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "card-vars",
+          "description": "`templates/metric-card.php` vypisuje `$cardLabel`",
+          "type": "file.contains",
+          "file": "templates/metric-card.php",
+          "text": "$cardLabel",
+          "hint": "Místo popisku karty vypište `$cardLabel`, místo čísla `$cardValue` (úkol 6)."
+        },
+        {
+          "id": "card-include",
+          "description": "`index.php` vkládá šablonu karty dvakrát",
+          "type": "file.contains",
+          "text": "metric-card.php",
+          "min_count": 2,
+          "hint": "Před každým `include __DIR__ . '/templates/metric-card.php';` nastavte `$cardLabel` a `$cardValue` (úkol 6)."
+        },
+        {
+          "id": "card-no-html",
+          "description": "`index.php` už neobsahuje HTML karet",
+          "type": "file.no-marker",
+          "marker": "rounded-xl bg-brand-50",
+          "hint": "HTML karty je jen v šabloně, v `index.php` zůstává obal `<div class=\"grid …\">` (úkol 6)."
+        },
+        {
+          "id": "card-render",
+          "description": "Obě karty se vykreslí s popiskem a číslem",
+          "type": "php.page",
+          "expected": "Dostupná témata</span>\\s*<h4[^>]*>\\s*[1-9]\\d*\\s*</h4>[\\s\\S]*Moje konzultace</span>\\s*<h4[^>]*>\\s*[1-9]\\d*\\s*</h4>",
+          "comparison": "regex",
+          "hint": "První karta má `$cardValue = $availableTopics`, druhá `$myConsultations`; obě vložte přes `include`, ne `include_once` (úkol 6)."
+        }
+      ]
+    },
+    {
+      "id": "kontakt",
+      "name": "Stránka Kontakt – contact.php (úkol 7)",
+      "prefix": "E",
+      "file": "contact.php",
+      "checks": [
+        {
+          "id": "contact-exists",
+          "description": "Soubor `contact.php` existuje",
+          "type": "file.exists",
+          "hint": "Nová stránka v kořeni projektu vedle `index.php` (úkol 7)."
+        },
+        {
+          "id": "contact-title",
+          "description": "`contact.php` má titulek `Kontakt | Maturita`",
+          "type": "php.page",
+          "expected": "<title>\\s*Kontakt \\| Maturita\\s*</title>",
+          "comparison": "regex",
+          "hint": "Začátek stránky stejně jako `index.php`, jen `$pageTitle = 'Kontakt';` (úkol 7)."
+        },
+        {
+          "id": "contact-h1",
+          "description": "Nadpis H1 `Kontakt`",
+          "type": "php.page",
+          "expected": "<h1[^>]*>\\s*Kontakt\\s*</h1>",
+          "comparison": "regex",
+          "hint": "Obsah stránky začíná `<h1>` s textem Kontakt (úkol 7)."
+        },
+        {
+          "id": "contact-mailto",
+          "description": "Odkaz `mailto:` s e-mailem z konfigurace",
+          "type": "php.page",
+          "expected": "href=\"mailto:maturita@oa-opava\\.cz\"",
+          "comparison": "regex",
+          "hint": "`<a href=\"mailto:…\">` — adresu vypište z `$config['email']` (úkol 7)."
+        },
+        {
+          "id": "contact-active",
+          "description": "Na `contact.php` je v menu zvýrazněný Kontakt",
+          "type": "php.page",
+          "expected": "href=\"contact\\.php\"[^>]*class=\"text-brand-600\"",
+          "comparison": "regex",
+          "hint": "Před `include` nastavte `$activePage = 'contact';` a odkaz v `menu.php` má ternární zápis jako ostatní (úkol 7)."
+        },
+        {
+          "id": "menu-contact-index",
+          "description": "Odkaz Kontakt je v menu i na `index.php`",
+          "type": "php.page",
+          "expected": "href=\"contact\\.php\"[^>]*>\\s*Kontakt\\s*</a>",
+          "comparison": "regex",
+          "hint": "Odkaz přidejte do `templates/menu.php`, ne do jednotlivých stránek (úkol 7).",
+          "file": "index.php"
+        },
+        {
+          "id": "contact-no-head",
+          "description": "`contact.php` neobsahuje `<head>`",
+          "type": "file.no-marker",
+          "marker": "<head>",
+          "hint": "Hlavičku vkládá `include` šablony `header.php` (úkol 7)."
+        },
+        {
+          "id": "contact-warnings",
+          "description": "`contact.php` se vykreslí bez varování PHP",
+          "type": "php.page",
+          "no_warnings": true,
+          "hint": "Hláška říká soubor a řádek; nejčastěji jde o proměnnou nastavenou až po `include` nebo o překlep v cestě (kapitola Časté chyby)."
+        }
+      ]
+    }
+  ]
+}

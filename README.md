@@ -146,6 +146,11 @@ první řádek chyby.
 Příklad — `examples/php_02_vystup_html/checks.json` (šablona
 `oa-pva4-Syllabus/PHP_02_VystupHtml`, 37 požadavků ve dvou blocích
 `index.php` / `aboutme.php`; kostra dá 1 bod, řešení 37).
+Projekt rozdělený do více souborů (`include`/`require`, šablony v `templates/`)
+ukazuje `examples/php_06_include_require/checks.json` (šablona
+`oa-pva4-Syllabus/PHP_06_prikazy_include_require`, 35 požadavků v pěti blocích;
+kontroly s vlastním `file` míří na `includes/` a `templates/`, kostra dá 3 body,
+řešení 35).
 
 ### Program v Pythonu: datové typy, funkce, techniky
 
