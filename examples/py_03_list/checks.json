@@ -1,0 +1,344 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 03: Datové struktury – seznamy",
+  "tasks": [
+    {
+      "id": "ukol-a",
+      "name": "Úkol A – Indexy a řezy",
+      "prefix": "A",
+      "file": "list.py",
+      "checks": [
+        {
+          "id": "stred",
+          "description": "Řez `stred` obsahuje [4, 9, 16]",
+          "type": "py.eval",
+          "expr": "stred",
+          "expected": [
+            4,
+            9,
+            16
+          ],
+          "hint": "Řez `seznam[start:stop]` – prvek na indexu stop už ve výsledku není (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "predposledni",
+          "description": "Předposlední prvek záporným indexem",
+          "type": "py.eval",
+          "expr": "predposledni",
+          "expected": 16,
+          "hint": "Záporný index počítá od konce: `seznam[-1]` je poslední prvek (kapitola Indexy v seznamu)."
+        },
+        {
+          "id": "kazdy-druhy",
+          "description": "Řez s krokem `kazdyDruhy` obsahuje [1, 9, 25]",
+          "type": "py.eval",
+          "expr": "kazdyDruhy",
+          "expected": [
+            1,
+            9,
+            25
+          ],
+          "hint": "Třetí číslo řezu je krok: `seznam[start:stop:step]`, start i stop lze vynechat (kapitola Přístup k prvkům)."
+        }
+      ]
+    },
+    {
+      "id": "ukol-b",
+      "name": "Úkol B – Přidání, vložení a odstranění prvků",
+      "prefix": "B",
+      "file": "operace.py",
+      "checks": [
+        {
+          "id": "dinosaurus",
+          "description": "\"dino\" je nahrazeno za \"dinosaurus\"",
+          "type": "py.eval",
+          "expr": "animals[-1]",
+          "expected": "dinosaurus",
+          "hint": "Prvek změníte přiřazením `seznam[index] = hodnota`, index najde `seznam.index(hodnota)` (kapitola Přidání a změna prvků)."
+        },
+        {
+          "id": "insert",
+          "description": "Na začátku seznamu je \"zebra\"",
+          "type": "py.eval",
+          "expr": "animals[0]",
+          "expected": "zebra",
+          "hint": "`seznam.insert(index, prvek)` vloží prvek na daný index (kapitola Vložení a hledání prvku)."
+        },
+        {
+          "id": "remove",
+          "description": "\"lion\" je ze seznamu odstraněn",
+          "type": "py.eval",
+          "expr": "\"lion\" in animals",
+          "expected": false,
+          "hint": "`seznam.remove(hodnota)` odstraní prvek podle hodnoty (kapitola Odstranění prvků)."
+        },
+        {
+          "id": "pop",
+          "description": "`odebrany` obsahuje prvek odebraný metodou pop() z indexu 1",
+          "type": "py.eval",
+          "expr": "[odebrany, \"elephant\" in animals]",
+          "expected": [
+            "elephant",
+            false
+          ],
+          "hint": "`seznam.pop(index)` prvek ze seznamu odebere a zároveň ho vrátí (kapitola Odstranění prvků)."
+        },
+        {
+          "id": "in",
+          "description": "`maTygra` obsahuje výsledek testu operátorem in",
+          "type": "py.eval",
+          "expr": "maTygra",
+          "expected": true,
+          "hint": "`prvek in seznam` vrátí `True` nebo `False` (kapitola Vložení a hledání prvku)."
+        }
+      ]
+    },
+    {
+      "id": "ukol-c",
+      "name": "Úkol C – Přiřazení do řezu a opakování seznamu",
+      "prefix": "C",
+      "file": "prvky.py",
+      "checks": [
+        {
+          "id": "sloni",
+          "description": "Ze všech zvířat jsou sloni",
+          "type": "py.eval",
+          "expr": "animals",
+          "expected": [
+            "elephant",
+            "elephant",
+            "elephant"
+          ],
+          "hint": "Do řezu lze přiřadit jiný seznam: `seznam[start:] = [...]` (kapitola Přidání a změna prvků)."
+        },
+        {
+          "id": "nuly",
+          "description": "`nuly` je seznam s deseti nulami",
+          "type": "py.eval",
+          "expr": "nuly",
+          "expected": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hint": "Operátor `*` seznam opakuje: `[prvek] * pocet` (kapitola Spojení a opakování seznamů)."
+        }
+      ]
+    },
+    {
+      "id": "ukol-d",
+      "name": "Úkol D – Vnořené seznamy",
+      "prefix": "D",
+      "file": "vnorene_seznamy.py",
+      "checks": [
+        {
+          "id": "devet",
+          "description": "`devet` obsahuje číslo 9 z vnořeného seznamu",
+          "type": "py.eval",
+          "expr": "devet",
+          "expected": 9,
+          "hint": "Indexy se řetězí: `seznam[i][j]` – nejdřív podseznam, pak prvek v něm (kapitola Seznam slovníků)."
+        },
+        {
+          "id": "deset",
+          "description": "`deset` obsahuje číslo 10",
+          "type": "py.eval",
+          "expr": "deset",
+          "expected": 10,
+          "hint": "Číslo 10 není v podseznamu, stačí jeden index (kapitola Indexy v seznamu)."
+        }
+      ]
+    },
+    {
+      "id": "ukol-e",
+      "name": "Úkol E – List souhrn",
+      "prefix": "E",
+      "file": "list_souhrn.py",
+      "checks": [
+        {
+          "id": "mocniny",
+          "description": "`mocniny` po přidání 2⁶ a 2⁷ a odebrání prvního prvku",
+          "type": "py.eval",
+          "expr": "mocniny",
+          "expected": [
+            2,
+            4,
+            8,
+            16,
+            32,
+            64,
+            128
+          ],
+          "hint": "Mocninu zapíšete `2 ** 6`, na konec přidá `append()`, první prvek odebere `del seznam[0]` (kapitola Odstranění prvků)."
+        },
+        {
+          "id": "prohozeni",
+          "description": "`result` má prohozený první a třetí prvek, `cisla` zůstal beze změny",
+          "type": "py.eval",
+          "expr": "[result, cisla]",
+          "expected": [
+            [
+              19,
+              65,
+              23,
+              90
+            ],
+            [
+              23,
+              65,
+              19,
+              90
+            ]
+          ],
+          "hint": "`result = cisla` nevytvoří kopii; nový seznam sestavte z prvků `[cisla[2], …]` (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "barvy",
+          "description": "Z `barvy` jsou odstraněny 1., 4. a 5. prvek",
+          "type": "py.eval",
+          "expr": "barvy",
+          "expected": [
+            "Green",
+            "White",
+            "Yellow"
+          ],
+          "hint": "Po `del` se indexy dalších prvků posunou – odstraňujte od konce (kapitola Odstranění prvků)."
+        },
+        {
+          "id": "min-max",
+          "description": "`nejmensi` a `nejvetsi` z funkcí min() a max()",
+          "type": "py.eval",
+          "expr": "[nejmensi, nejvetsi]",
+          "expected": [
+            4,
+            4087
+          ],
+          "hint": "`min(seznam)` a `max(seznam)` (kapitola Funkce a metody)."
+        },
+        {
+          "id": "min-max-jinak",
+          "description": "`nejmensi2` a `nejvetsi2` jiným způsobem",
+          "type": "py.eval",
+          "expr": "[nejmensi2, nejvetsi2]",
+          "expected": [
+            4,
+            4087
+          ],
+          "hint": "Seřazený seznam má nejmenší prvek na indexu `0` a největší na `-1` (kapitola sorted() vs. sort())."
+        },
+        {
+          "id": "obracene",
+          "description": "`obracene` má prvky v opačném pořadí",
+          "type": "py.eval",
+          "expr": "obracene",
+          "expected": [
+            2971,
+            32,
+            379,
+            88,
+            10,
+            264,
+            14,
+            8,
+            4,
+            448,
+            12,
+            4087,
+            98,
+            5,
+            1456
+          ],
+          "hint": "Řez se záporným krokem `seznam[::-1]` (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "volvo",
+          "description": "V `cars` je 'vojvo' nahrazeno za 'Volvo'",
+          "type": "py.eval",
+          "expr": "cars[5]",
+          "expected": "Volvo",
+          "hint": "Prvek změníte přiřazením `seznam[index] = hodnota` (kapitola Přidání a změna prvků)."
+        },
+        {
+          "id": "luxury",
+          "description": "`luxuryCars` obsahuje druhý až čtvrtý prvek `cars`",
+          "type": "py.eval",
+          "expr": "luxuryCars",
+          "expected": [
+            "Lamborghini",
+            "lexus",
+            "porsche"
+          ],
+          "hint": "Druhý prvek má index 1; řez `seznam[start:stop]` stop nezahrnuje (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "soucet",
+          "description": "`operationSum` je součet prvků `operation`",
+          "type": "py.eval",
+          "expr": "operationSum",
+          "expected": 9876,
+          "hint": "`sum(seznam)` (kapitola Funkce a metody)."
+        },
+        {
+          "id": "pocet",
+          "description": "`pocetAut` je počet aut v `cars`",
+          "type": "py.eval",
+          "expr": "pocetAut",
+          "expected": 11,
+          "hint": "`len(seznam)` (kapitola Funkce a metody)."
+        },
+        {
+          "id": "index",
+          "description": "`indexFerrari` je index auta 'Ferrari'",
+          "type": "py.eval",
+          "expr": "indexFerrari",
+          "expected": 4,
+          "hint": "`seznam.index(hodnota)` vrátí index prvku (kapitola Vložení a hledání prvku)."
+        },
+        {
+          "id": "serazena",
+          "description": "`serazenaAuta` je seřazený seznam, `cars` zůstal beze změny",
+          "type": "py.eval",
+          "expr": "[serazenaAuta, cars[0]]",
+          "expected": [
+            [
+              "DS",
+              "Ferrari",
+              "Jeep",
+              "Lamborghini",
+              "Mini",
+              "Suzuki",
+              "Volvo",
+              "chevrolet",
+              "lexus",
+              "porsche",
+              "Škoda"
+            ],
+            "Suzuki"
+          ],
+          "hint": "`sorted(seznam)` vrátí nový seznam, `seznam.sort()` mění původní a vrací `None` (kapitola sorted() vs. sort())."
+        },
+        {
+          "id": "aliasing",
+          "description": "`odpoved` obsahuje obsah `myList2` po provedení kódu",
+          "type": "py.eval",
+          "expr": "odpoved",
+          "expected": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "hint": "Kód si spusťte a výsledek `myList2` zapište jako seznam `[…]`."
+        }
+      ]
+    }
+  ]
+}
