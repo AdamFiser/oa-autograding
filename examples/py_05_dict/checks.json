@@ -1,0 +1,154 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 05: Datové struktury – slovník",
+  "tasks": [
+    {
+      "id": "slovnik",
+      "name": "Slovník (dict)",
+      "file": "reseni.py",
+      "checks": [
+        {
+          "id": "klice",
+          "description": "`zamestnanec` má klíče name, surname, salary",
+          "type": "py.eval",
+          "expr": "sorted(zamestnanec)",
+          "expected": [
+            "name",
+            "salary",
+            "surname"
+          ],
+          "hint": "Slovník `{'klic': hodnota, …}` ve složených závorkách (kapitola Deklarace slovníku)."
+        },
+        {
+          "id": "mzda",
+          "description": "Mzda zaměstnance je navýšená o 6 %",
+          "type": "py.eval",
+          "expr": "zamestnanec['salary']",
+          "expected": 31800,
+          "hint": "Hodnotu změníte přiřazením `slovnik[klic] = nova_hodnota`; mzda musí být číslo, ne text (kapitola Přidání, změna a odstranění)."
+        },
+        {
+          "id": "emp3",
+          "description": "`employees` obsahuje nového zaměstnance pod klíčem emp3",
+          "type": "py.eval",
+          "expr": "sorted(employees)",
+          "expected": [
+            "emp1",
+            "emp2",
+            "emp3"
+          ],
+          "hint": "Přiřazení do nového klíče položku přidá: `slovnik['novy'] = hodnota` (kapitola Přidání, změna a odstranění)."
+        },
+        {
+          "id": "emp2-hodnoty",
+          "description": "`emp2Hodnoty` je seznam hodnot zaměstnance emp2",
+          "type": "py.eval",
+          "expr": "emp2Hodnoty",
+          "expected": [
+            "Emma",
+            "Phillips",
+            28000
+          ],
+          "hint": "`values()` vrátí pohled, seznam z něj udělá `list()` (kapitola Metody)."
+        },
+        {
+          "id": "location",
+          "description": "Klíč city je přejmenovaný na location",
+          "type": "py.eval",
+          "expr": "[emp_selected.get('location'), 'city' in emp_selected]",
+          "expected": [
+            "Prague",
+            false
+          ],
+          "hint": "Klíč nejde přejmenovat přímo: hodnotu uložte pod nový klíč a starý odstraňte, `pop()` obojí spojí (kapitola Přidání, změna a odstranění)."
+        },
+        {
+          "id": "odstraneni",
+          "description": "Z `emp_selected` jsou odstraněny klíče age a salary",
+          "type": "py.eval",
+          "expr": "sorted(emp_selected)",
+          "expected": [
+            "location",
+            "name"
+          ],
+          "hint": "`del slovnik[klic]` nebo `slovnik.pop(klic)` (kapitola Přidání, změna a odstranění)."
+        },
+        {
+          "id": "prumer",
+          "description": "`prumer` je průměr bodů ze `grades`",
+          "type": "py.eval",
+          "expr": "prumer",
+          "expected": 77,
+          "hint": "Průměr je součet hodnot děleno počtem položek: `sum(…)` a `len(…)` (kapitola Metody)."
+        },
+        {
+          "id": "body",
+          "description": "`body` je seznam bodů ze `grades`",
+          "type": "py.eval",
+          "expr": "body",
+          "expected": [
+            85,
+            67,
+            73,
+            88,
+            64,
+            91,
+            71
+          ],
+          "hint": "`list(slovnik.values())` (kapitola Metody)."
+        },
+        {
+          "id": "predmety",
+          "description": "`predmety` je seznam předmětů ze `grades`",
+          "type": "py.eval",
+          "expr": "predmety",
+          "expected": [
+            "Czech",
+            "Chemistry",
+            "History",
+            "Economics",
+            "Physics",
+            "Computer Science",
+            "Mathematics"
+          ],
+          "hint": "`list(slovnik.keys())` (kapitola Metody)."
+        },
+        {
+          "id": "get",
+          "description": "`bodyBiologie` je 0 pro chybějící předmět",
+          "type": "py.eval",
+          "expr": "bodyBiologie",
+          "expected": 0,
+          "hint": "`slovnik.get(klic, vychozi)` vrátí výchozí hodnotu místo `KeyError` (kapitola Chybějící klíč)."
+        },
+        {
+          "id": "in",
+          "description": "`maFyziku` a `ma100` z operátoru in",
+          "type": "py.eval",
+          "expr": "[maFyziku, ma100]",
+          "expected": [
+            true,
+            false
+          ],
+          "hint": "`in` hledá jen v klíčích; hodnoty prohledáte přes `slovnik.values()` (kapitola Operátor in)."
+        },
+        {
+          "id": "seznam-slovniku",
+          "description": "`prvniZnamkaPetra` je první známka žáka Petr",
+          "type": "py.eval",
+          "expr": "prvniZnamkaPetra",
+          "expected": 3,
+          "hint": "Přístup se řetězí: index v seznamu, klíč ve slovníku, index ve známkách (kapitola Seznam slovníků)."
+        },
+        {
+          "id": "append",
+          "description": "V seznamu `trida` je přidaný třetí žák",
+          "type": "py.eval",
+          "expr": "len(trida)",
+          "expected": 3,
+          "hint": "Do seznamu přidáte slovník `append({'jmeno': …, 'znamky': […]})` (kapitola Seznam slovníků)."
+        }
+      ]
+    }
+  ]
+}

@@ -172,6 +172,10 @@ dostane prázdný vstup.
 Příklad — `examples/py_co_umim_z_pva1/checks.json` (šablona
 `oa-pva2-Syllabus/Py_CoUmimzPVA1`, 23 požadavků v blocích data / funkce /
 výstupy / techniky; kostra dá 1 bod, řešení 23).
+Datové struktury pokrývají `examples/py_03_list` (25 požadavků v pěti
+souborech), `examples/py_04_tuple` (14, včetně `run` se `stdin`)
+a `examples/py_05_dict` (13) — šablony `oa-pva2-Syllabus/Py_03_DatoveStruktury_List`,
+`…_Tuple` a `…_Dictionary`; kostra dá 0 bodů, řešení plný počet.
 
 ## Vývoj
 

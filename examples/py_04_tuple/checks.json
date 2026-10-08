@@ -1,0 +1,178 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 04: Datové struktury – n-tice",
+  "tasks": [
+    {
+      "id": "ntice",
+      "name": "N-tice (tuple)",
+      "file": "reseni.py",
+      "checks": [
+        {
+          "id": "delka",
+          "description": "`delka` je délka ntice `alphabet`",
+          "type": "py.eval",
+          "expr": "delka",
+          "expected": 26,
+          "hint": "`len(ntice)` (kapitola Kdy použít tuple)."
+        },
+        {
+          "id": "jednoprvkova",
+          "description": "`onlyOne` je jednoprvková ntice s hodnotou 'Python'",
+          "type": "py.eval",
+          "expr": "f\"{type(onlyOne).__name__}: {onlyOne!r}\"",
+          "expected": "tuple: ('Python',)",
+          "hint": "O ntici rozhoduje čárka: `(prvek,)` (kapitola Tuple – neměnnost a rozbalení)."
+        },
+        {
+          "id": "profese",
+          "description": "`profese` je ntice tří profesí",
+          "type": "py.eval",
+          "expr": "f\"{type(profese).__name__}: {profese!r}\"",
+          "expected": "tuple: ('Strojvedoucí', 'Vlakvedoucí', 'Vozmistr')",
+          "hint": "Ntice se píše v kulatých závorkách `(a, b, c)` (kapitola Tuple)."
+        },
+        {
+          "id": "souradnice",
+          "description": "`souradnice` je nová ntice (22, 33)",
+          "type": "py.eval",
+          "expr": "f\"{type(souradnice).__name__}: {souradnice!r}\"",
+          "expected": "tuple: (22, 33)",
+          "hint": "Ntice spojíte `+` a zkrátíte řezem; výsledek přiřaďte znovu do proměnné (kapitola Tuple – neměnnost a rozbalení)."
+        },
+        {
+          "id": "kladne",
+          "description": "`prvni` a `druhy` prvek ntice",
+          "type": "py.eval",
+          "expr": "[prvni, druhy]",
+          "expected": [
+            "a",
+            "b"
+          ],
+          "hint": "Indexuje se od nuly: `ntice[0]` (kapitola Tuple)."
+        },
+        {
+          "id": "zaporne",
+          "description": "`posledni` a `predposledni` prvek ntice",
+          "type": "py.eval",
+          "expr": "[posledni, predposledni]",
+          "expected": [
+            "z",
+            "y"
+          ],
+          "hint": "Záporný index počítá od konce: `ntice[-1]` (kapitola Indexy v seznamu)."
+        },
+        {
+          "id": "kazdy-treti",
+          "description": "`kazdyTreti` obsahuje každý třetí prvek",
+          "type": "py.eval",
+          "expr": "kazdyTreti",
+          "expected": [
+            "a",
+            "d",
+            "g",
+            "j",
+            "m",
+            "p",
+            "s",
+            "v",
+            "y"
+          ],
+          "hint": "Řez s krokem `ntice[::krok]` (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "prvnich-pet",
+          "description": "`prvnichPet` obsahuje prvních pět prvků",
+          "type": "py.eval",
+          "expr": "prvnichPet",
+          "expected": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e"
+          ],
+          "hint": "Řez bez startu `ntice[:stop]` (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "poslednich-pet",
+          "description": "`poslednichPet` obsahuje posledních pět prvků",
+          "type": "py.eval",
+          "expr": "poslednichPet",
+          "expected": [
+            "v",
+            "w",
+            "x",
+            "y",
+            "z"
+          ],
+          "hint": "Řez se záporným startem `ntice[-n:]` (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "pulka",
+          "description": "`prvniPulka` obsahuje první polovinu prvků",
+          "type": "py.eval",
+          "expr": "prvniPulka",
+          "expected": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m"
+          ],
+          "hint": "Polovinu délky spočítáte `len(ntice) // 2`, index řezu musí být celé číslo (kapitola Přístup k prvkům)."
+        },
+        {
+          "id": "rozbaleni",
+          "description": "`rok`, `mesic`, `den` z rozbalené ntice `datum`",
+          "type": "py.eval",
+          "expr": "[rok, mesic, den]",
+          "expected": [
+            2026,
+            10,
+            1
+          ],
+          "hint": "Rozbalení: `a, b, c = ntice` (kapitola Tuple – neměnnost a rozbalení)."
+        },
+        {
+          "id": "index",
+          "description": "`indexRepository` a `indexFactory`",
+          "type": "py.eval",
+          "expr": "[indexRepository, indexFactory]",
+          "expected": [
+            1,
+            3
+          ],
+          "hint": "`ntice.index(hodnota)` vrátí index prvku (kapitola Kdy použít tuple)."
+        },
+        {
+          "id": "pocet",
+          "description": "Výpis počtu výskytů x, y, z (pro vstup 1, 2, 1)",
+          "type": "run",
+          "cmd": "python reseni.py",
+          "stdin": "1\n2\n1\n",
+          "expected": "Počet výskytů.*x:\\s*2,\\s*y:\\s*1,\\s*z:\\s*2",
+          "comparison": "regex",
+          "hint": "Hodnoty načtěte `int(input())`, počet zjistíte `ntice.count(hodnota)`; výpis porovnejte se zadáním (kapitola Kdy použít tuple)."
+        },
+        {
+          "id": "soucet",
+          "description": "Výpis zadaných hodnot a jejich součtu (pro vstup 1, 2, 1)",
+          "type": "run",
+          "cmd": "python reseni.py",
+          "stdin": "1\n2\n1\n",
+          "expected": "x:\\s*1,\\s*y:\\s*2,\\s*z:\\s*1 a jejich součet je:\\s*4",
+          "comparison": "regex",
+          "hint": "Text z `input()` je řetězec – před sčítáním ho převeďte `int()`; formát výpisu porovnejte se zadáním."
+        }
+      ]
+    }
+  ]
+}

@@ -89,3 +89,22 @@ def test_php06_reseni_passes_everything():
     rep = grade(load_spec(PHP06_EX / "checks.json"), PHP06_EX / "reseni")
     assert rep.passed, rep.failed_labels
     assert rep.score == rep.max_score == 35
+
+
+PY_DATA_EXAMPLES = [("py_03_list", 25), ("py_04_tuple", 14), ("py_05_dict", 13)]
+
+
+@pytest.mark.parametrize(("name", "points"), PY_DATA_EXAMPLES)
+def test_py_data_kostra_fails_everything(name, points):
+    ex = Path(__file__).resolve().parents[1] / "examples" / name
+    rep = grade(load_spec(ex / "checks.json"), ex / "kostra")
+    # Kostra má místo řešení `...`, program bez vstupu neproběhne, takže nic neprojde.
+    assert rep.score == 0 and rep.max_score == points
+
+
+@pytest.mark.parametrize(("name", "points"), PY_DATA_EXAMPLES)
+def test_py_data_reseni_passes_everything(name, points):
+    ex = Path(__file__).resolve().parents[1] / "examples" / name
+    rep = grade(load_spec(ex / "checks.json"), ex / "reseni")
+    assert rep.passed, rep.failed_labels
+    assert rep.score == rep.max_score == points
