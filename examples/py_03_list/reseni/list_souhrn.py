@@ -26,7 +26,9 @@ print(mocniny)
 # Očekávaný výstup: [23, 65, 19, 90] a [19, 65, 23, 90]
 
 cisla = [23, 65, 19, 90]
-result = [cisla[2], cisla[1], cisla[0], cisla[3]]
+result = cisla.copy()  # kopie, původní `cisla` se nemění
+result[0], result[2] = result[2], result[0]
+
 print(cisla)
 print(result)
 
