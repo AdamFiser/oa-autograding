@@ -1,0 +1,323 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 04: PHP - Podmínky",
+  "tasks": [
+    {
+      "id": "pozdrav",
+      "name": "Příprava a pozdrav podle denní doby (úkol 1)",
+      "prefix": "A",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "meta-author",
+          "description": "Meta author vypisuje vaše jméno z konfigurace",
+          "type": "php.page",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "V `includes/config.php` přepište `yourName` na své jméno (Než začnete)."
+        },
+        {
+          "id": "version",
+          "description": "Patička ukazuje verzi `1.2`",
+          "type": "php.page",
+          "expected": "Maturita v1.2",
+          "hint": "V `includes/config.php` nastavte `'version' => '1.2'` (Než začnete)."
+        },
+        {
+          "id": "hour-7",
+          "description": "V 7 hodin pozdraví `Dobré ráno`",
+          "type": "php.page",
+          "query": {
+            "hour": "7"
+          },
+          "expected": "Dobré ráno, ",
+          "hint": "Podmínka nad `$hour` jde od noci (`>= 22 || < 5`) přes ráno a den k večeru, provede se jen první splněná větev (kapitola Větvení podmínek else, elseif)."
+        },
+        {
+          "id": "hour-10",
+          "description": "V 10 hodin pozdraví `Dobrý den`",
+          "type": "php.page",
+          "query": {
+            "hour": "10"
+          },
+          "expected": "Dobrý den, ",
+          "hint": "Podmínka nad `$hour` jde od noci (`>= 22 || < 5`) přes ráno a den k večeru, provede se jen první splněná větev (kapitola Větvení podmínek else, elseif). Ráno je jen do 9 hodin včetně."
+        },
+        {
+          "id": "hour-18",
+          "description": "V 18 hodin pozdraví `Dobrý večer`",
+          "type": "php.page",
+          "query": {
+            "hour": "18"
+          },
+          "expected": "Dobrý večer, ",
+          "hint": "Podmínka nad `$hour` jde od noci (`>= 22 || < 5`) přes ráno a den k večeru, provede se jen první splněná větev (kapitola Větvení podmínek else, elseif). Den je jen do 17 hodin včetně."
+        },
+        {
+          "id": "hour-22",
+          "description": "Ve 22 hodin pozdraví `Dobrou noc`",
+          "type": "php.page",
+          "query": {
+            "hour": "22"
+          },
+          "expected": "Dobrou noc, ",
+          "hint": "Podmínka nad `$hour` jde od noci (`>= 22 || < 5`) přes ráno a den k večeru, provede se jen první splněná větev (kapitola Větvení podmínek else, elseif)."
+        },
+        {
+          "id": "hour-4",
+          "description": "Ve 4 hodiny ráno pozdraví `Dobrou noc`",
+          "type": "php.page",
+          "query": {
+            "hour": "4"
+          },
+          "expected": "Dobrou noc, ",
+          "hint": "Podmínka nad `$hour` jde od noci (`>= 22 || < 5`) přes ráno a den k večeru, provede se jen první splněná větev (kapitola Větvení podmínek else, elseif). Noc má dvě části spojené operátorem `||`."
+        }
+      ]
+    },
+    {
+      "id": "termin",
+      "name": "Termín odevzdání (úkoly 2 a 3)",
+      "prefix": "B",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "days-12",
+          "description": "Bez parametru zeleně `Do odevzdání zbývá 12 dní.`",
+          "type": "php.page",
+          "expected": "text-green-600\">Do odevzdání zbývá 12 dní.<",
+          "hint": "Větve podle `$daysLeft`: `> 7`, `> 0`, `=== 0`, jinak záporné; v každé nastavte `$deadlineText` i `$deadlineClass` (kapitola Větvení podmínek else, elseif)."
+        },
+        {
+          "id": "days-7",
+          "description": "Při 7 dnech oranžově `Do odevzdání zbývá 7 dní.`",
+          "type": "php.page",
+          "query": {
+            "days": "7"
+          },
+          "expected": "text-amber-600\">Do odevzdání zbývá 7 dní.<",
+          "hint": "Větve podle `$daysLeft`: `> 7`, `> 0`, `=== 0`, jinak záporné; v každé nastavte `$deadlineText` i `$deadlineClass` (kapitola Větvení podmínek else, elseif). Zelená je jen pro víc než 7 dní."
+        },
+        {
+          "id": "days-5",
+          "description": "Při 5 dnech oranžově `Do odevzdání zbývá 5 dní.`",
+          "type": "php.page",
+          "query": {
+            "days": "5"
+          },
+          "expected": "text-amber-600\">Do odevzdání zbývá 5 dní.<",
+          "hint": "Větve podle `$daysLeft`: `> 7`, `> 0`, `=== 0`, jinak záporné; v každé nastavte `$deadlineText` i `$deadlineClass` (kapitola Větvení podmínek else, elseif)."
+        },
+        {
+          "id": "days-0",
+          "description": "V den termínu červeně `Termín odevzdání je dnes!`",
+          "type": "php.page",
+          "query": {
+            "days": "0"
+          },
+          "expected": "text-red-600\">Termín odevzdání je dnes!<",
+          "hint": "Větve podle `$daysLeft`: `> 7`, `> 0`, `=== 0`, jinak záporné; v každé nastavte `$deadlineText` i `$deadlineClass` (kapitola Větvení podmínek else, elseif)."
+        },
+        {
+          "id": "days-minus-5",
+          "description": "Po termínu červeně `Termín odevzdání uplynul o 5 dní.`",
+          "type": "php.page",
+          "query": {
+            "days": "-5"
+          },
+          "expected": "text-red-600\">Termín odevzdání uplynul o 5 dní.<",
+          "hint": "Větve podle `$daysLeft`: `> 7`, `> 0`, `=== 0`, jinak záporné; v každé nastavte `$deadlineText` i `$deadlineClass` (kapitola Větvení podmínek else, elseif). Číslo vypište přes `abs($daysLeft)`."
+        },
+        {
+          "id": "word-1",
+          "description": "Tvar `zbývá 1 den.`",
+          "type": "php.page",
+          "query": {
+            "days": "1"
+          },
+          "expected": "Do odevzdání zbývá 1 den.",
+          "hint": "Tvar určete z `abs($daysLeft)`: 1 → `den`, 2 až 4 → `dny`, jinak `dní`, a vložte `$daysWord` do obou textů (úkol 3)."
+        },
+        {
+          "id": "word-3",
+          "description": "Tvar `zbývá 3 dny.`",
+          "type": "php.page",
+          "query": {
+            "days": "3"
+          },
+          "expected": "Do odevzdání zbývá 3 dny.",
+          "hint": "Tvar určete z `abs($daysLeft)`: 1 → `den`, 2 až 4 → `dny`, jinak `dní`, a vložte `$daysWord` do obou textů (úkol 3)."
+        },
+        {
+          "id": "word-minus-1",
+          "description": "Tvar `uplynul o 1 den.`",
+          "type": "php.page",
+          "query": {
+            "days": "-1"
+          },
+          "expected": "Termín odevzdání uplynul o 1 den.",
+          "hint": "Tvar určete z `abs($daysLeft)`: 1 → `den`, 2 až 4 → `dny`, jinak `dní`, a vložte `$daysWord` do obou textů (úkol 3)."
+        },
+        {
+          "id": "word-minus-3",
+          "description": "Tvar `uplynul o 3 dny.`",
+          "type": "php.page",
+          "query": {
+            "days": "-3"
+          },
+          "expected": "Termín odevzdání uplynul o 3 dny.",
+          "hint": "Tvar určete z `abs($daysLeft)`: 1 → `den`, 2 až 4 → `dny`, jinak `dní`, a vložte `$daysWord` do obou textů (úkol 3)."
+        }
+      ]
+    },
+    {
+      "id": "profil",
+      "name": "Stav tématu a odevzdání práce (úkoly 4 a 5)",
+      "prefix": "C",
+      "file": "aboutme.php",
+      "checks": [
+        {
+          "id": "status-pending",
+          "description": "Výchozí stav: oranžový štítek `čeká na schválení`",
+          "type": "php.page",
+          "expected": "bg-amber-100 text-amber-700\">čeká na schválení<",
+          "hint": "Dva výrazy `match ($status)`: jeden vrací popisek do `$statusLabel`, druhý třídy do `$statusClass` (kapitola match)."
+        },
+        {
+          "id": "status-approved",
+          "description": "`?status=approved`: zelený štítek `schváleno`",
+          "type": "php.page",
+          "query": {
+            "status": "approved"
+          },
+          "expected": "bg-green-100 text-green-700\">schváleno<",
+          "hint": "Dva výrazy `match ($status)`: jeden vrací popisek do `$statusLabel`, druhý třídy do `$statusClass` (kapitola match)."
+        },
+        {
+          "id": "status-rejected",
+          "description": "`?status=rejected`: červený štítek `zamítnuto`",
+          "type": "php.page",
+          "query": {
+            "status": "rejected"
+          },
+          "expected": "bg-red-100 text-red-700\">zamítnuto<",
+          "hint": "Dva výrazy `match ($status)`: jeden vrací popisek do `$statusLabel`, druhý třídy do `$statusClass` (kapitola match)."
+        },
+        {
+          "id": "uses-match",
+          "description": "Stav tématu převádí výraz `match`",
+          "type": "file.contains",
+          "text": "match (",
+          "hint": "Dva výrazy `match ($status)`: jeden vrací popisek do `$statusLabel`, druhý třídy do `$statusClass` (kapitola match)."
+        },
+        {
+          "id": "status-default",
+          "description": "Neznámý stav: šedý štítek `neznámý stav` bez chyby",
+          "type": "php.page",
+          "query": {
+            "status": "xyz"
+          },
+          "expected": "bg-gray-100 text-gray-600\">neznámý stav<",
+          "no_warnings": true,
+          "hint": "Bez větve `default` skončí `match` chybou `UnhandledMatchError` (kapitola match)."
+        },
+        {
+          "id": "submit-default",
+          "description": "Bez schváleného tématu: `Nejdříve musí být schválené téma.`",
+          "type": "php.page",
+          "expected": "text-red-600\">Nejdříve musí být schválené téma.<",
+          "hint": "Nejdřív `if ($hasEnoughConsultations && $isTopicApproved)`, pak `elseif (!$isTopicApproved)`, nakonec `else` s počtem chybějících konzultací (kapitola Skládání podmínek)."
+        },
+        {
+          "id": "submit-missing-1",
+          "description": "Schválené téma, 2 konzultace: `Chybí ještě 1 konzultace.`",
+          "type": "php.page",
+          "query": {
+            "status": "approved"
+          },
+          "expected": "text-amber-600\">Chybí ještě 1 konzultace.<",
+          "hint": "Nejdřív `if ($hasEnoughConsultations && $isTopicApproved)`, pak `elseif (!$isTopicApproved)`, nakonec `else` s počtem chybějících konzultací (kapitola Skládání podmínek)."
+        },
+        {
+          "id": "submit-missing-2",
+          "description": "Schválené téma, 1 konzultace: `Chybí ještě 2 konzultace.`",
+          "type": "php.page",
+          "query": {
+            "status": "approved",
+            "consultations": "1"
+          },
+          "expected": "Chybí ještě 2 konzultace.",
+          "hint": "Nejdřív `if ($hasEnoughConsultations && $isTopicApproved)`, pak `elseif (!$isTopicApproved)`, nakonec `else` s počtem chybějících konzultací (kapitola Skládání podmínek). Počet je `$requiredConsultations - $myConsultations`."
+        },
+        {
+          "id": "submit-ok",
+          "description": "Schválené téma, 3 konzultace: `Můžete odevzdat maturitní práci.`",
+          "type": "php.page",
+          "query": {
+            "status": "approved",
+            "consultations": "3"
+          },
+          "expected": "text-green-600\">Můžete odevzdat maturitní práci.<",
+          "hint": "Nejdřív `if ($hasEnoughConsultations && $isTopicApproved)`, pak `elseif (!$isTopicApproved)`, nakonec `else` s počtem chybějících konzultací (kapitola Skládání podmínek)."
+        },
+        {
+          "id": "submit-rejected",
+          "description": "Zamítnuté téma, 3 konzultace: text o schválení tématu",
+          "type": "php.page",
+          "query": {
+            "status": "rejected",
+            "consultations": "3"
+          },
+          "expected": "text-red-600\">Nejdříve musí být schválené téma.<",
+          "hint": "Nejdřív `if ($hasEnoughConsultations && $isTopicApproved)`, pak `elseif (!$isTopicApproved)`, nakonec `else` s počtem chybějících konzultací (kapitola Skládání podmínek). Obě podmínky musí platit zároveň."
+        },
+        {
+          "id": "named-consultations",
+          "description": "Pojmenovaná podmínka `$hasEnoughConsultations`",
+          "type": "file.contains",
+          "text": "$hasEnoughConsultations =",
+          "hint": "`$hasEnoughConsultations = $myConsultations >= …;` nad podmínkou (kapitola Pojmenované podmínky)."
+        },
+        {
+          "id": "named-approved",
+          "description": "Pojmenovaná podmínka `$isTopicApproved`",
+          "type": "file.contains",
+          "text": "$isTopicApproved =",
+          "hint": "`$isTopicApproved = $status === …;` nad podmínkou (kapitola Pojmenované podmínky)."
+        }
+      ]
+    },
+    {
+      "id": "bez-chyb",
+      "name": "Stránky bez chyb",
+      "prefix": "D",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "index-clean",
+          "description": "`index.php?hour=3&days=-2`: pozdrav `Dobrou noc` a žádné varování PHP",
+          "type": "php.page",
+          "query": {
+            "hour": "3",
+            "days": "-2"
+          },
+          "expected": "Dobrou noc, ",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; typicky proměnná použitá dřív, než ji podmínka nastaví."
+        },
+        {
+          "id": "aboutme-clean",
+          "description": "`aboutme.php?status=abc`: text o schválení tématu a žádné varování PHP",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "query": {
+            "status": "abc"
+          },
+          "expected": "Nejdříve musí být schválené téma.",
+          "no_warnings": true,
+          "hint": "Každá proměnná, kterou stránka vypisuje, musí mít hodnotu ve všech větvích podmínky."
+        }
+      ]
+    }
+  ]
+}

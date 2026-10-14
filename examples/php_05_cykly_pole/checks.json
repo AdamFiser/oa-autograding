@@ -1,0 +1,287 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 05: PHP - Cykly a pole",
+  "tasks": [
+    {
+      "id": "menu",
+      "name": "Příprava a menu z pole (úkol 1)",
+      "prefix": "A",
+      "file": "templates/menu.php",
+      "checks": [
+        {
+          "id": "meta-author",
+          "description": "Meta author vypisuje vaše jméno z konfigurace",
+          "type": "php.page",
+          "file": "index.php",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "V `includes/config.php` přepište `yourName` na své jméno (Než začnete)."
+        },
+        {
+          "id": "version",
+          "description": "Patička ukazuje verzi `1.3`",
+          "type": "php.page",
+          "file": "index.php",
+          "expected": "Maturita v1.3",
+          "hint": "V `includes/config.php` nastavte `'version' => '1.3'` (Než začnete)."
+        },
+        {
+          "id": "menu-foreach",
+          "description": "`menu.php` vypisuje odkazy cyklem `foreach`",
+          "type": "file.contains",
+          "text": "foreach (",
+          "hint": "`<?php foreach ($config['menu'] as $page => $label) { ?>` a jeden odkaz `<a>` uvnitř (kapitola Cyklus foreach s klíčem)."
+        },
+        {
+          "id": "menu-config",
+          "description": "`menu.php` prochází pole `$config['menu']`",
+          "type": "file.contains",
+          "text": "$config['menu']",
+          "hint": "Do pole v `config.php` přidejte klíč `'menu' => ['index' => 'Přehled', …]` a cyklus projde `$config['menu']` (úkol 1)."
+        },
+        {
+          "id": "menu-no-manual",
+          "description": "V `menu.php` nezůstal ručně psaný odkaz na Přehled",
+          "type": "file.no-marker",
+          "marker": "href=\"index.php\"",
+          "hint": "Adresu skládejte z klíče: `href=\"<?php echo $page; ?>.php\"` (úkol 1)."
+        },
+        {
+          "id": "menu-active-profil",
+          "description": "Na Profilu je aktivní odkaz `Profil` z pole menu",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "expected": "<a href=\"aboutme.php\" class=\"text-brand-600\">Profil</a>",
+          "hint": "Text odkazu je `$label`, třída se porovnává `$activePage === $page` (úkol 1)."
+        }
+      ]
+    },
+    {
+      "id": "tabulka",
+      "name": "Tabulka historických témat (úkoly 2 a 3)",
+      "prefix": "B",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "table-all-rows",
+          "description": "Tabulka vypisuje všech osm témat",
+          "type": "php.page",
+          "expected": "E-shop s výrobky studentské firmy",
+          "hint": "Jeden řádek `<tr>` uvnitř `foreach ($topics as $index => $topic)`, hodnoty z `$topic['title']` atd. (kapitola Cyklus foreach)."
+        },
+        {
+          "id": "table-foreach",
+          "description": "Tabulka prochází pole cyklem `foreach ($topics as …)`",
+          "type": "file.contains",
+          "text": "foreach ($topics as",
+          "hint": "Jeden řádek `<tr>` uvnitř `foreach ($topics as $index => $topic)`, hodnoty z `$topic['title']` atd. (kapitola Cyklus foreach)."
+        },
+        {
+          "id": "table-no-manual",
+          "description": "Nezůstaly ručně psané řádky s `$topics[1]`",
+          "type": "file.no-marker",
+          "marker": "$topics[1]",
+          "hint": "Ručně psané řádky smažte, cyklus vypíše všechny (úkol 2)."
+        },
+        {
+          "id": "grade-text",
+          "description": "Známka 3 se vypíše jako `3 (dobře)`",
+          "type": "php.page",
+          "expected": "3 (dobře)",
+          "hint": "V PHP bloku s otevírací závorkou cyklu: `$gradeText = match ($topic['grade']) { 1 => 'výborně', … };` (kapitola match)."
+        },
+        {
+          "id": "grade-match",
+          "description": "Slovní známku převádí výraz `match`",
+          "type": "file.contains",
+          "text": "match (",
+          "hint": "V PHP bloku s otevírací závorkou cyklu: `$gradeText = match ($topic['grade']) { 1 => 'výborně', … };` (kapitola match)."
+        },
+        {
+          "id": "zebra",
+          "description": "Řádky se střídají `bg-white` a `bg-gray-50`",
+          "type": "php.page",
+          "expected": "<tr class=\"bg-white\">[\\s\\S]*?<tr class=\"bg-gray-50\">[\\s\\S]*?<tr class=\"bg-white\">",
+          "comparison": "regex",
+          "hint": "`foreach ($topics as $index => $topic)` a třída podle `$index % 2 === 1` (úkol 3)."
+        },
+        {
+          "id": "zebra-modulo",
+          "description": "Střídání řádků počítá zbytek po dělení `% 2`",
+          "type": "file.contains",
+          "text": "% 2",
+          "hint": "Lichý index má zbytek po dělení dvěma 1: `$index % 2 === 1` (úkol 3)."
+        }
+      ]
+    },
+    {
+      "id": "statistiky",
+      "name": "Statistiky témat (úkol 4)",
+      "prefix": "C",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "average",
+          "description": "Karta `Průměrná známka` ukazuje `2.25`",
+          "type": "php.page",
+          "expected": "Průměrná známka</span>\\s*<h4[^>]*>2\\.25</h4>",
+          "comparison": "regex",
+          "hint": "Před cyklem `$bestGrade` a `$worstGrade` = `$topics[0]['grade']`, v cyklu přičítejte a porovnávejte, za cyklem `round($gradeSum / count($topics), 2)` (úkol 4)."
+        },
+        {
+          "id": "best-worst",
+          "description": "Karta `Nejlepší / nejhorší známka` ukazuje `1 / 4`",
+          "type": "php.page",
+          "expected": "Nejlepší / nejhorší známka</span>\\s*<h4[^>]*>1 / 4</h4>",
+          "comparison": "regex",
+          "hint": "Před cyklem `$bestGrade` a `$worstGrade` = `$topics[0]['grade']`, v cyklu přičítejte a porovnávejte, za cyklem `round($gradeSum / count($topics), 2)` (úkol 4)."
+        },
+        {
+          "id": "cards-foreach",
+          "description": "Karty se vkládají cyklem `foreach ($cards as …)`",
+          "type": "file.contains",
+          "text": "foreach ($cards as",
+          "hint": "Pole `$cards` s klíči `label` a `value`, v `foreach ($cards as $card)` nastavte `$cardLabel`, `$cardValue` a vložte šablonu (úkol 4)."
+        },
+        {
+          "id": "no-min",
+          "description": "Minimum se počítá cyklem, ne funkcí `min()`",
+          "type": "file.no-marker",
+          "marker": "min(",
+          "hint": "V cyklu porovnejte `$topic['grade'] < $bestGrade` a případně hodnotu přepište (úkol 4)."
+        },
+        {
+          "id": "no-max",
+          "description": "Maximum se počítá cyklem, ne funkcí `max()`",
+          "type": "file.no-marker",
+          "marker": "max(",
+          "hint": "V cyklu porovnejte `$topic['grade'] > $worstGrade` a případně hodnotu přepište (úkol 4)."
+        }
+      ]
+    },
+    {
+      "id": "konzultace",
+      "name": "Konzultace na Profilu (úkoly 5–7)",
+      "prefix": "D",
+      "file": "aboutme.php",
+      "checks": [
+        {
+          "id": "count-done",
+          "description": "Karta ukazuje `Konzultace: 2 z 3`",
+          "type": "php.page",
+          "expected": "Konzultace: 2 z 3",
+          "hint": "Cyklem přes `$consultations` zvyšte `$myConsultations++` u každé se stavem `done` (úkol 5)."
+        },
+        {
+          "id": "list-done",
+          "description": "Seznam obsahuje `24. 9. 2026 – Výběr tématu (absolvována)`",
+          "type": "php.page",
+          "expected": "<li>\\s*24\\. 9\\. 2026 [–-] Výběr tématu \\(absolvována\\)\\s*</li>",
+          "comparison": "regex",
+          "hint": "V `<ul>` cyklus `foreach ($consultations as $consultation)`, zrušené přeskočte `continue`, jinak `<li>datum – téma (stav)</li>` (kapitola break a continue)."
+        },
+        {
+          "id": "list-planned",
+          "description": "Seznam obsahuje `5. 11. 2026 – Návrh databáze (naplánována)`",
+          "type": "php.page",
+          "expected": "<li>\\s*5\\. 11\\. 2026 [–-] Návrh databáze \\(naplánována\\)\\s*</li>",
+          "comparison": "regex",
+          "hint": "V `<ul>` cyklus `foreach ($consultations as $consultation)`, zrušené přeskočte `continue`, jinak `<li>datum – téma (stav)</li>` (kapitola break a continue)."
+        },
+        {
+          "id": "list-no-cancelled",
+          "description": "Zrušená konzultace `Analýza zadání` v seznamu není",
+          "type": "php.page",
+          "expected": "\\A(?![\\s\\S]*Analýza zadání)[\\s\\S]*<li>",
+          "comparison": "regex",
+          "hint": "V `<ul>` cyklus `foreach ($consultations as $consultation)`, zrušené přeskočte `continue`, jinak `<li>datum – téma (stav)</li>` (kapitola break a continue)."
+        },
+        {
+          "id": "uses-continue",
+          "description": "Zrušené konzultace přeskakuje `continue`",
+          "type": "file.contains",
+          "text": "continue;",
+          "hint": "V `<ul>` cyklus `foreach ($consultations as $consultation)`, zrušené přeskočte `continue`, jinak `<li>datum – téma (stav)</li>` (kapitola break a continue)."
+        },
+        {
+          "id": "next",
+          "description": "`Nejbližší konzultace: 5. 11. 2026 – Návrh databáze`",
+          "type": "php.page",
+          "expected": "Nejbližší konzultace: 5\\. 11\\. 2026 [–-] Návrh databáze",
+          "comparison": "regex",
+          "hint": "Druhý cyklus: u první konzultace se stavem `planned` uložte `datum – téma` a ukončete cyklus `break` (kapitola break a continue)."
+        },
+        {
+          "id": "uses-break",
+          "description": "Hledání nejbližší konzultace končí `break`",
+          "type": "file.contains",
+          "text": "break;",
+          "hint": "Druhý cyklus: u první konzultace se stavem `planned` uložte `datum – téma` a ukončete cyklus `break` (kapitola break a continue)."
+        },
+        {
+          "id": "step-done",
+          "description": "Kolečko `2` je modré (absolvovaná konzultace)",
+          "type": "php.page",
+          "expected": "bg-brand-600 text-white\">2</span>",
+          "hint": "`for ($i = 1; $i <= $requiredConsultations; $i++)`, třída podle `$i <= $myConsultations` (kapitola Cyklus for)."
+        },
+        {
+          "id": "step-todo",
+          "description": "Kolečko `3` je šedé (chybějící konzultace)",
+          "type": "php.page",
+          "expected": "bg-gray-100 text-gray-400\">3</span>",
+          "hint": "`for ($i = 1; $i <= $requiredConsultations; $i++)`, třída podle `$i <= $myConsultations` (kapitola Cyklus for)."
+        },
+        {
+          "id": "uses-for",
+          "description": "Kolečka vypisuje cyklus `for` s čítačem `$i`",
+          "type": "file.contains",
+          "text": "for ($i",
+          "hint": "`for ($i = 1; $i <= $requiredConsultations; $i++)`, třída podle `$i <= $myConsultations` (kapitola Cyklus for)."
+        },
+        {
+          "id": "weeks",
+          "description": "Bonus: `… napíšete 30 stran za 8 týdnů.`",
+          "type": "php.page",
+          "expected": "za 8 týdnů.",
+          "hint": "`while ($pagesWritten < $pagesTotal)` — v těle přičtěte `$pagesPerWeek` a zvyšte `$weeksNeeded` (kapitola Cyklus while)."
+        },
+        {
+          "id": "uses-while",
+          "description": "Bonus: počet týdnů počítá cyklus `while`",
+          "type": "file.contains",
+          "text": "while (",
+          "hint": "`while ($pagesWritten < $pagesTotal)` — v těle přičtěte `$pagesPerWeek` a zvyšte `$weeksNeeded` (kapitola Cyklus while)."
+        }
+      ]
+    },
+    {
+      "id": "bez-chyb",
+      "name": "Stránky bez chyb",
+      "prefix": "E",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "index-clean",
+          "description": "`index.php`: všech osm témat a žádné varování PHP",
+          "type": "php.page",
+          "expected": "E-shop s výrobky studentské firmy",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; typicky překlep v klíči pole (`$topic['titel']`) nebo proměnná použitá mimo cyklus."
+        },
+        {
+          "id": "aboutme-clean",
+          "description": "`aboutme.php?status=approved`: `Konzultace: 2 z 3` a žádné varování PHP",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "query": {
+            "status": "approved"
+          },
+          "expected": "Konzultace: 2 z 3",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; typicky překlep v klíči pole nebo proměnná použitá mimo cyklus."
+        }
+      ]
+    }
+  ]
+}

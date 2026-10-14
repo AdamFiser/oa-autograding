@@ -150,7 +150,11 @@ Projekt rozdělený do více souborů (`include`/`require`, šablony v `template
 ukazuje `examples/php_06_include_require/checks.json` (šablona
 `oa-pva4-Syllabus/PHP_06_prikazy_include_require`, 35 požadavků v pěti blocích;
 kontroly s vlastním `file` míří na `includes/` a `templates/`, kostra dá 3 body,
-řešení 35).
+řešení 35). Na něj navazují `examples/php_04_podminky` (30 požadavků; větve
+podmínek se testují přes `query`, např. `{"hour": "4"}`, kostra dá 1 bod) a
+`examples/php_05_cykly_pole` (32 požadavků; výstup cyklů přes `php.page`,
+použité konstrukce přes `file.contains` / `file.no-marker`, kostra dá 2 body)
+— šablony `oa-pva4-Syllabus/PHP_04_Podminky` a `PHP_05_Cykly_Pole`.
 
 ### Program v Pythonu: datové typy, funkce, techniky
 
