@@ -48,6 +48,14 @@ def test_fatal_and_parse_error(repo):
     assert not res.passed and "Parse error" in res.reason
 
 
+def test_source_contains_ignores_comments(repo):
+    src = "<?php\n// getGreeting( jen v komentáři\n$g = 'Ahoj'; ?>\n<!-- getGreeting( -->\n<p><?= $g ?></p>\n"
+    res = page(repo, src, expected="<p>Ahoj</p>", source_contains=["getGreeting("])
+    assert not res.passed and "chybí `getGreeting(`" in res.reason
+    src = "<?php\nfunction getGreeting(): string { return 'Ahoj'; }\n$g = getGreeting ( ); ?>\n<p><?= $g ?></p>\n"
+    assert page(repo, src, expected="<p>Ahoj</p>", source_contains=["getGreeting(", "$g=getGreeting()"]).passed
+
+
 def test_bad_comparison(repo):
     res = page(repo, "x", expected="x", comparison="exact")
     assert not res.passed and "checks.json" in res.reason

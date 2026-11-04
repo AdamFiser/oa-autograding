@@ -9,7 +9,7 @@ import site
 import subprocess
 import sys
 
-VERSION = "2026.11.0"
+VERSION = "2026.11.1"
 
 PACKAGE = f"git+https://github.com/adamfiser/oa-autograding@{VERSION}"
 PIP = [sys.executable, "-m", "pip", "install", "--quiet"]
