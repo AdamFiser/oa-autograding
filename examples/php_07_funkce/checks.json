@@ -1,0 +1,816 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 07: PHP - Funkce",
+  "tasks": [
+    {
+      "id": "priprava",
+      "name": "Příprava a strict types (úkol 1)",
+      "prefix": "A",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "meta-author",
+          "description": "Meta author vypisuje vaše jméno z konfigurace",
+          "type": "php.page",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "V `includes/config.php` přepište `yourName` na své jméno (Než začnete)."
+        },
+        {
+          "id": "version",
+          "description": "Patička ukazuje verzi `1.4`",
+          "type": "php.page",
+          "expected": "Maturita v1.4",
+          "hint": "V `includes/config.php` nastavte `'version' => '1.4'` (Než začnete)."
+        },
+        {
+          "id": "strict-functions",
+          "description": "`includes/functions.php` začíná `declare(strict_types=1);`",
+          "type": "file.contains",
+          "file": "includes/functions.php",
+          "text": "declare(strict_types=1);",
+          "hint": "Hned za `<?php` jako první příkaz souboru (kapitola Strict types v praxi)."
+        },
+        {
+          "id": "strict-index",
+          "description": "`index.php` začíná `declare(strict_types=1);`",
+          "type": "file.contains",
+          "file": "index.php",
+          "text": "declare(strict_types=1);",
+          "hint": "Hned za `<?php` jako první příkaz souboru (kapitola Strict types v praxi)."
+        },
+        {
+          "id": "strict-aboutme",
+          "description": "`aboutme.php` začíná `declare(strict_types=1);`",
+          "type": "file.contains",
+          "file": "aboutme.php",
+          "text": "declare(strict_types=1);",
+          "hint": "Hned za `<?php` jako první příkaz souboru (kapitola Strict types v praxi)."
+        }
+      ]
+    },
+    {
+      "id": "pozdrav-termin",
+      "name": "Pozdrav a termín odevzdání (úkoly 2 a 3)",
+      "prefix": "B",
+      "file": "includes/functions.php",
+      "checks": [
+        {
+          "id": "greeting",
+          "description": "`getGreeting(int $hour): string` vrací pozdrav podle hodiny",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "getGreeting",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                4
+              ],
+              "expected": "Dobrou noc"
+            },
+            {
+              "args": [
+                7
+              ],
+              "expected": "Dobré ráno"
+            },
+            {
+              "args": [
+                12
+              ],
+              "expected": "Dobrý den"
+            },
+            {
+              "args": [
+                20
+              ],
+              "expected": "Dobrý večer"
+            },
+            {
+              "args": [
+                23
+              ],
+              "expected": "Dobrou noc"
+            }
+          ],
+          "hint": "Podmínky z `index.php` přesuňte do funkce, místo `$greeting = …` pište `return …;` (kapitola Uživatelsky definované funkce)."
+        },
+        {
+          "id": "days-word",
+          "description": "`getDaysWord(int $days): string` vrací `den` / `dny` / `dní`",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "getDaysWord",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                1
+              ],
+              "expected": "den"
+            },
+            {
+              "args": [
+                3
+              ],
+              "expected": "dny"
+            },
+            {
+              "args": [
+                5
+              ],
+              "expected": "dní"
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": "dní"
+            },
+            {
+              "args": [
+                -2
+              ],
+              "expected": "dny"
+            }
+          ],
+          "hint": "Uvnitř funkce pracujte s `abs($days)`, ať funguje i záporný počet (kapitola Parametry funkce)."
+        },
+        {
+          "id": "deadline-text",
+          "description": "`getDeadlineText(int $daysLeft): string` vrací text termínu",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "getDeadlineText",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                12
+              ],
+              "expected": "Do odevzdání zbývá 12 dní."
+            },
+            {
+              "args": [
+                3
+              ],
+              "expected": "Do odevzdání zbývá 3 dny."
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": "Termín odevzdání je dnes!"
+            },
+            {
+              "args": [
+                -1
+              ],
+              "expected": "Termín odevzdání uplynul o 1 den."
+            }
+          ],
+          "hint": "Data dostává funkce parametrem, tvar slova si zjistí voláním `getDaysWord($daysLeft)` a text vrátí přes `return` (kapitola Antipattern: výpis místo return)."
+        },
+        {
+          "id": "deadline-class",
+          "description": "`getDeadlineClass(int $daysLeft): string` vrací barvu termínu",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "getDeadlineClass",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                12
+              ],
+              "expected": "text-green-600"
+            },
+            {
+              "args": [
+                3
+              ],
+              "expected": "text-amber-600"
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": "text-red-600"
+            },
+            {
+              "args": [
+                -3
+              ],
+              "expected": "text-red-600"
+            }
+          ],
+          "hint": "Víc než 7 dní zelená, 1–7 oranžová, jinak červená; jedna funkce = jedna úloha, text a barva zvlášť (kapitola Další antipatterny ve funkcích)."
+        },
+        {
+          "id": "no-global",
+          "description": "Funkce nepoužívají `global`",
+          "type": "file.no-marker",
+          "marker": "global $",
+          "hint": "Co funkce potřebuje, uveďte jako parametr v hlavičce (kapitola Antipattern: global místo parametru)."
+        },
+        {
+          "id": "no-print-deadline",
+          "description": "Funkce `printDeadline()` je odstraněná",
+          "type": "file.no-marker",
+          "marker": "function printDeadline",
+          "hint": "Nahradily ji `getDeadlineText()` a `getDeadlineClass()`; nepoužívanou funkci smažte (úkol 3)."
+        },
+        {
+          "id": "page-deadline",
+          "description": "`index.php?hour=7&days=3`: „Dobré ráno“ a oranžové „Do odevzdání zbývá 3 dny.“",
+          "type": "php.page",
+          "file": "index.php",
+          "query": {
+            "hour": "7",
+            "days": "3"
+          },
+          "expected": "Dobré ráno,[\\s\\S]*class=\"[^\"]*text-amber-600[^\"]*\">\\s*Do odevzdání zbývá 3 dny\\.",
+          "comparison": "regex",
+          "hint": "`<p class=\"… <?php echo getDeadlineClass($daysLeft); ?>\"><?php echo getDeadlineText($daysLeft); ?></p>` (úkol 3)."
+        },
+        {
+          "id": "page-calls-greeting",
+          "description": "`index.php` volá `getGreeting()`",
+          "type": "file.contains",
+          "file": "index.php",
+          "text": "getGreeting(",
+          "hint": "`$greeting = getGreeting($hour);` místo řetězce podmínek (kapitola Volání funkce)."
+        }
+      ]
+    },
+    {
+      "id": "temata",
+      "name": "Témata a průměr (úkoly 4 a 5)",
+      "prefix": "C",
+      "file": "includes/functions.php",
+      "checks": [
+        {
+          "id": "grade-text",
+          "description": "`getGradeText(int $grade): string` vrací známku slovy",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "getGradeText",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                1
+              ],
+              "expected": "výborně"
+            },
+            {
+              "args": [
+                2
+              ],
+              "expected": "chvalitebně"
+            },
+            {
+              "args": [
+                3
+              ],
+              "expected": "dobře"
+            },
+            {
+              "args": [
+                4
+              ],
+              "expected": "dostatečně"
+            },
+            {
+              "args": [
+                5
+              ],
+              "expected": "nedostatečně"
+            },
+            {
+              "args": [
+                6
+              ],
+              "expected": "neznámá známka"
+            }
+          ],
+          "hint": "Funkce může rovnou vrátit výsledek `match`: `return match ($grade) { … };` (kapitola Uživatelsky definované funkce)."
+        },
+        {
+          "id": "no-match-in-page",
+          "description": "V `index.php` už není `match`",
+          "type": "file.no-marker",
+          "file": "index.php",
+          "marker": "match (",
+          "hint": "V tabulce vypište `<?php echo getGradeText($topic['grade']); ?>` (úkol 4)."
+        },
+        {
+          "id": "page-grade",
+          "description": "Tabulka ukazuje `3 (dobře)`",
+          "type": "php.page",
+          "file": "index.php",
+          "expected": "3 (dobře)",
+          "hint": "V tabulce vypište `<?php echo getGradeText($topic['grade']); ?>` (úkol 4)."
+        },
+        {
+          "id": "average",
+          "description": "`calculateAverageGrade(array $topics): float` vrací průměr, pro prázdné pole `0.0`",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "calculateAverageGrade",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Evidence výpůjček ve školní knihovně",
+                    "author": "Petr Šťastný",
+                    "year": 2025,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Online objednávky školní jídelny",
+                    "author": "Lucie Krátká",
+                    "year": 2023,
+                    "grade": 3
+                  },
+                  {
+                    "title": "Kvízová aplikace pro výuku zeměpisu",
+                    "author": "Tomáš Beneš",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "E-shop s výrobky studentské firmy",
+                    "author": "David Novotný",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ]
+              ],
+              "expected": 2.25,
+              "label": "pole $topics z index.php"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  }
+                ]
+              ],
+              "expected": 1.5,
+              "label": "první dvě témata"
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": 0.0
+            }
+          ],
+          "hint": "Součet známek v cyklu, `round(… / count($topics), 2)`; prázdné pole ošetřete na začátku `return 0.0;` — dělit nulou nejde (kapitola Parametry funkce)."
+        },
+        {
+          "id": "page-average",
+          "description": "Karta `Průměrná známka` ukazuje `2.25`",
+          "type": "php.page",
+          "file": "index.php",
+          "expected": "Průměrná známka</span>\\s*<h4[^>]*>2\\.25</h4>",
+          "comparison": "regex",
+          "hint": "`$averageGrade = calculateAverageGrade($topics);` (úkol 5)."
+        }
+      ]
+    },
+    {
+      "id": "profil",
+      "name": "Konzultace a plán psaní (úkoly 6 a 7)",
+      "prefix": "D",
+      "file": "includes/functions.php",
+      "checks": [
+        {
+          "id": "count",
+          "description": "`countConsultations(array $consultations, string $state = 'done'): int`",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "countConsultations",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "date": "24. 9. 2026",
+                    "topic": "Výběr tématu",
+                    "state": "done"
+                  },
+                  {
+                    "date": "8. 10. 2026",
+                    "topic": "Osnova práce",
+                    "state": "done"
+                  },
+                  {
+                    "date": "22. 10. 2026",
+                    "topic": "Analýza zadání",
+                    "state": "cancelled"
+                  },
+                  {
+                    "date": "5. 11. 2026",
+                    "topic": "Návrh databáze",
+                    "state": "planned"
+                  },
+                  {
+                    "date": "19. 11. 2026",
+                    "topic": "Prototyp aplikace",
+                    "state": "planned"
+                  }
+                ]
+              ],
+              "expected": 2,
+              "label": "$consultations"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "date": "24. 9. 2026",
+                    "topic": "Výběr tématu",
+                    "state": "done"
+                  },
+                  {
+                    "date": "8. 10. 2026",
+                    "topic": "Osnova práce",
+                    "state": "done"
+                  },
+                  {
+                    "date": "22. 10. 2026",
+                    "topic": "Analýza zadání",
+                    "state": "cancelled"
+                  },
+                  {
+                    "date": "5. 11. 2026",
+                    "topic": "Návrh databáze",
+                    "state": "planned"
+                  },
+                  {
+                    "date": "19. 11. 2026",
+                    "topic": "Prototyp aplikace",
+                    "state": "planned"
+                  }
+                ],
+                "planned"
+              ],
+              "expected": 2,
+              "label": "$consultations, \"planned\""
+            },
+            {
+              "args": [
+                [
+                  {
+                    "date": "24. 9. 2026",
+                    "topic": "Výběr tématu",
+                    "state": "done"
+                  },
+                  {
+                    "date": "8. 10. 2026",
+                    "topic": "Osnova práce",
+                    "state": "done"
+                  },
+                  {
+                    "date": "22. 10. 2026",
+                    "topic": "Analýza zadání",
+                    "state": "cancelled"
+                  },
+                  {
+                    "date": "5. 11. 2026",
+                    "topic": "Návrh databáze",
+                    "state": "planned"
+                  },
+                  {
+                    "date": "19. 11. 2026",
+                    "topic": "Prototyp aplikace",
+                    "state": "planned"
+                  }
+                ],
+                "cancelled"
+              ],
+              "expected": 1,
+              "label": "$consultations, \"cancelled\""
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Výchozí hodnota se píše do hlavičky `string $state = 'done'`; bez druhého argumentu pak funkce počítá absolvované (kapitola Parametry funkce)."
+        },
+        {
+          "id": "next",
+          "description": "`findNextConsultation(array $consultations): ?string`, bez naplánované vrací `null`",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "findNextConsultation",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "date": "24. 9. 2026",
+                    "topic": "Výběr tématu",
+                    "state": "done"
+                  },
+                  {
+                    "date": "8. 10. 2026",
+                    "topic": "Osnova práce",
+                    "state": "done"
+                  },
+                  {
+                    "date": "22. 10. 2026",
+                    "topic": "Analýza zadání",
+                    "state": "cancelled"
+                  },
+                  {
+                    "date": "5. 11. 2026",
+                    "topic": "Návrh databáze",
+                    "state": "planned"
+                  },
+                  {
+                    "date": "19. 11. 2026",
+                    "topic": "Prototyp aplikace",
+                    "state": "planned"
+                  }
+                ]
+              ],
+              "expected": "5. 11. 2026 – Návrh databáze",
+              "label": "$consultations"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "date": "24. 9. 2026",
+                    "topic": "Výběr tématu",
+                    "state": "done"
+                  },
+                  {
+                    "date": "8. 10. 2026",
+                    "topic": "Osnova práce",
+                    "state": "done"
+                  }
+                ]
+              ],
+              "expected": null,
+              "label": "jen absolvované konzultace"
+            }
+          ],
+          "hint": "Návratový typ `?string`; `return` uvnitř cyklu funkci rovnou ukončí, za cyklem `return null;` (kapitola Uživatelsky definované funkce)."
+        },
+        {
+          "id": "weeks",
+          "description": "`calculateWeeks(int $pagesTotal, int $pagesPerWeek): int`",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "calculateWeeks",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                30,
+                4
+              ],
+              "expected": 8
+            },
+            {
+              "args": [
+                0,
+                4
+              ],
+              "expected": 0
+            },
+            {
+              "args": [
+                10,
+                5
+              ],
+              "expected": 2
+            }
+          ],
+          "hint": "Cyklus `while` z `aboutme.php` přesuňte do funkce a vraťte počet týdnů (kapitola Rozsah platnosti proměnných)."
+        },
+        {
+          "id": "page-count",
+          "description": "Profil ukazuje `Konzultace: 2 z 3`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "expected": "Konzultace: 2 z 3",
+          "hint": "Na začátek `aboutme.php` přidejte `require_once` souboru funkcí a `$myConsultations = countConsultations($consultations);` (úkoly 1 a 6)."
+        },
+        {
+          "id": "page-next",
+          "description": "Profil ukazuje `Nejbližší konzultace: 5. 11. 2026 – Návrh databáze`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "expected": "Nejbližší konzultace: 5\\. 11\\. 2026 [–-] Návrh databáze",
+          "comparison": "regex",
+          "hint": "`findNextConsultation($consultations) ?? 'žádná není naplánovaná'` — operátor `??` dosadí text místo `null` (úkol 6)."
+        },
+        {
+          "id": "page-weeks",
+          "description": "Profil ukazuje `… napíšete 30 stran za 8 týdnů.`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "expected": "za 8 týdnů.",
+          "hint": "`$weeksNeeded = calculateWeeks($pagesTotal, $pagesPerWeek);` (úkol 7)."
+        },
+        {
+          "id": "no-while-in-page",
+          "description": "V `aboutme.php` nezůstal cyklus `while`",
+          "type": "file.no-marker",
+          "file": "aboutme.php",
+          "marker": "while (",
+          "hint": "Výpočet patří do funkce `calculateWeeks()`, stránka ji jen zavolá (úkol 7)."
+        }
+      ]
+    },
+    {
+      "id": "rekurze",
+      "name": "Bonus: osnova rekurzí (úkol 8)",
+      "prefix": "E",
+      "file": "includes/functions.php",
+      "checks": [
+        {
+          "id": "chapters",
+          "description": "`countChapters(array $chapters): int` spočítá kapitoly rekurzí",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "countChapters",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "title": "Úvod",
+                    "chapters": []
+                  },
+                  {
+                    "title": "Teoretická část",
+                    "chapters": [
+                      {
+                        "title": "Bezpečnostní hrozby",
+                        "chapters": [
+                          {
+                            "title": "SQL injection",
+                            "chapters": []
+                          },
+                          {
+                            "title": "Cross-site scripting",
+                            "chapters": []
+                          }
+                        ]
+                      },
+                      {
+                        "title": "Ochrana hesel",
+                        "chapters": []
+                      }
+                    ]
+                  },
+                  {
+                    "title": "Praktická část",
+                    "chapters": [
+                      {
+                        "title": "Návrh aplikace",
+                        "chapters": []
+                      },
+                      {
+                        "title": "Implementace",
+                        "chapters": []
+                      }
+                    ]
+                  },
+                  {
+                    "title": "Závěr",
+                    "chapters": []
+                  }
+                ]
+              ],
+              "expected": 10,
+              "label": "$outline z aboutme.php"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Úvod",
+                    "chapters": []
+                  },
+                  {
+                    "title": "Jádro",
+                    "chapters": []
+                  },
+                  {
+                    "title": "Závěr",
+                    "chapters": []
+                  }
+                ]
+              ],
+              "expected": 3,
+              "label": "3 kapitoly bez podkapitol"
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": 0
+            }
+          ],
+          "calls_itself": true,
+          "hint": "Každá kapitola = 1 + počet jejích podkapitol, který spočítá `countChapters($chapter['chapters'])`; prázdné pole vrátí 0 (kapitola Rekurze)."
+        },
+        {
+          "id": "page-chapters",
+          "description": "Profil ukazuje `celkem 10 kapitol`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "expected": "celkem 10 kapitol",
+          "hint": "Do věty o osnově doplňte `, celkem <?php echo countChapters($outline); ?> kapitol` (úkol 8)."
+        }
+      ]
+    },
+    {
+      "id": "bez-chyb",
+      "name": "Stránky bez chyb",
+      "prefix": "F",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "index-clean",
+          "description": "`index.php`: všech osm témat a žádné varování PHP",
+          "type": "php.page",
+          "expected": "E-shop s výrobky studentské firmy",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; typicky proměnná, kterou jste přesunuli do funkce, ale stránka ji ještě vypisuje."
+        },
+        {
+          "id": "aboutme-clean",
+          "description": "`aboutme.php?status=approved`: `Konzultace: 2 z 3` a žádné varování PHP",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "query": {
+            "status": "approved"
+          },
+          "expected": "Konzultace: 2 z 3",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; typicky chybějící `require_once` souboru funkcí nebo překlep v klíči pole."
+        },
+        {
+          "id": "contact-clean",
+          "description": "`contact.php` se vykreslí bez varování PHP",
+          "type": "php.page",
+          "file": "contact.php",
+          "expected": "Kontakt",
+          "no_warnings": true,
+          "hint": "PHP hlásí soubor a řádek; `declare(strict_types=1);` musí být hned za `<?php`."
+        }
+      ]
+    }
+  ]
+}

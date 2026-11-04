@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.9.1
+pip install git+https://github.com/adamfiser/oa-autograding@2026.11.0
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -155,6 +155,30 @@ podmínek se testují přes `query`, např. `{"hour": "4"}`, kostra dá 1 bod) a
 `examples/php_05_cykly_pole` (32 požadavků; výstup cyklů přes `php.page`,
 použité konstrukce přes `file.contains` / `file.no-marker`, kostra dá 2 body)
 — šablony `oa-pva4-Syllabus/PHP_04_Podminky` a `PHP_05_Cykly_Pole`.
+
+### PHP funkce
+
+Typ `php.function` (`oa_autograding/checks/php.py`) načte soubor z `file`
+(výstup souboru zahodí), zavolá funkci `name` z kódu se `strict_types`
+a výsledek porovná **včetně typu** (`"8"` ≠ `8`; int a float se smí zaměnit).
+Žák dostane konkrétní volání: „`getDaysWord(5)` vrátila "dní", očekáváno "dny".“
+
+| Parametr | Význam |
+|---|---|
+| `name` | název funkce (povinné) |
+| `cases` | `[{"args": [...], "expected": …, "label": "…"}]`; `label` nahradí ve zprávě dlouhé argumenty (pole) popisem |
+| `typed` | `true` = každý parametr i návratová hodnota musí mít datový typ |
+| `calls_itself` | `true` = funkce musí volat sama sebe (rekurze) |
+| `timeout` | limit v sekundách (výchozí `10`) |
+
+Funkce, která při volání cokoli vypíše (`echo` místo `return`), neprojde nikdy.
+Chybí-li funkce, nebo soubor nejde načíst (chyba syntaxe, dvakrát definovaná
+funkce), žák dostane první řádek chyby.
+
+Příklad — `examples/php_07_funkce/checks.json` (šablona
+`oa-pva4-Syllabus/PHP_07_Funkce`, 30 požadavků; funkce přes `php.function`,
+že se výstup stránek refaktoringem nezměnil, přes `php.page`; kostra dá 9 bodů
+za nezměněné stránky, řešení 30).
 
 ### Program v Pythonu: datové typy, funkce, techniky
 
