@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.11.0
+pip install git+https://github.com/adamfiser/oa-autograding@2026.11.1
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -136,6 +136,7 @@ PHP CLI, **HTML komentáře z výstupu odstraní** a teprve pak porovná.
 | `expected`, `comparison` | text (`included`, výchozí) nebo `regex`; bez `expected` stačí, že se stránka vykreslí |
 | `query` | slovník pro `$_GET`, např. `{"hledat": "  auto  "}` — simuluje `index.php?hledat=…` |
 | `no_warnings` | `true` = neprojde stránka, ve které PHP hlásí chybu, varování, upozornění nebo deprecated |
+| `source_contains` | seznam textů, které musí být v kódu stránky mimo komentáře (mezery se neporovnávají), např. `["getGreeting("]` — u refaktoringu, kdy kostra už správný výstup dává |
 | `timeout` | limit v sekundách (výchozí `10`) |
 
 Chyby PHP jdou mimo výstup stránky (na stderr), takže varování samo nerozbije
@@ -176,9 +177,9 @@ Chybí-li funkce, nebo soubor nejde načíst (chyba syntaxe, dvakrát definovan�
 funkce), žák dostane první řádek chyby.
 
 Příklad — `examples/php_07_funkce/checks.json` (šablona
-`oa-pva4-Syllabus/PHP_07_Funkce`, 30 požadavků; funkce přes `php.function`,
-že se výstup stránek refaktoringem nezměnil, přes `php.page`; kostra dá 9 bodů
-za nezměněné stránky, řešení 30).
+`oa-pva4-Syllabus/PHP_07_Funkce`, 29 požadavků; funkce přes `php.function`,
+že stránky dávají stejný výstup a počítají ho funkcí, přes `php.page`
+se `source_contains`; kostra dá 0 bodů, řešení 29).
 
 ### Program v Pythonu: datové typy, funkce, techniky
 

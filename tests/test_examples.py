@@ -114,17 +114,15 @@ PHP07_EX = Path(__file__).resolve().parents[1] / "examples" / "php_07_funkce"
 
 
 @needs_php
-def test_php07_kostra_passes_only_page_guards():
+def test_php07_kostra_scores_zero():
     rep = grade(load_spec(PHP07_EX / "checks.json"), PHP07_EX / "kostra")
-    # Refaktoring do funkcí výstup stránek nemění: kostra projde jen kontrolami vykreslených
-    # stránek (B7, C3, C5, D4–D6, F1–F3); všechny funkce, strict types i úklid chybí.
-    labels = {c.label for t in rep.tasks for c in t.task.checks}
-    assert labels - set(rep.failed_labels) == {"B7", "C3", "C5", "D4", "D5", "D6", "F1", "F2", "F3"}
-    assert rep.score == 9
+    # Výstup stránek se refaktoringem nemění, proto kontroly stránek vyžadují i volání funkce
+    # v kódu (`source_contains`) — kostra beze změn nesmí dostat ani bod.
+    assert rep.score == 0 and rep.max_score == 29
 
 
 @needs_php
 def test_php07_reseni_passes_everything():
     rep = grade(load_spec(PHP07_EX / "checks.json"), PHP07_EX / "reseni")
     assert rep.passed, rep.failed_labels
-    assert rep.score == rep.max_score == 30
+    assert rep.score == rep.max_score == 29

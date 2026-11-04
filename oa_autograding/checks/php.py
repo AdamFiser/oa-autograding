@@ -6,6 +6,8 @@
   odstraní HTML komentáře (v cvičeních v nich je text zadání včetně očekávaného
   výstupu) a porovná. S `no_warnings` neprojde stránka, ve které PHP ohlásí chybu,
   varování, upozornění nebo deprecated. Bez `expected` stačí, že se stránka vykreslí.
+  `source_contains` (seznam textů) navíc vyžaduje, aby je kód stránky obsahoval mimo
+  komentáře (bez ohledu na mezery) — stejný výstup tak nestačí, když ho nepočítá funkce.
 - `php.function`: `name` (povinné), `cases` (`[{"args": [...], "expected": …, "label": …}]`),
   `typed` (`false`), `calls_itself` (`false`), `timeout` (`10` s) — načte soubor, zavolá
   funkci se `strict_types` a porovná výsledek včetně typu (int a float se smí zaměnit).
@@ -81,6 +83,16 @@ def php_page(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
         if not ok:
             return CheckResult(
                 False, f"Ve vykreslené stránce{_query_note(query)} chybí očekávaný výstup (HTML komentáře se nepočítají).", details,
+            )
+    if p.get("source_contains"):
+        # `php -w` zahodí PHP komentáře, HTML komentáře odstraníme sami; mezery se neporovnávají.
+        src = subprocess.run(["php", "-w", ctx.file.name], cwd=ctx.file.parent, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=timeout).stdout
+        code = re.sub(r"\s+", "", strip_html_comments(src))
+        missing = [t for t in p["source_contains"] if re.sub(r"\s+", "", t) not in code]
+        if missing:
+            return CheckResult(
+                False, f"Stránka ukazuje správný výsledek, ale v jejím kódu chybí `{missing[0]}` (komentáře se nepočítají).", details,
             )
     return CheckResult(True, details=details)
 
