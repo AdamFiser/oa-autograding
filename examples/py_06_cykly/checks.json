@@ -1,0 +1,261 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 06: Řídicí struktury – cykly",
+  "tasks": [
+    {
+      "id": "cykly",
+      "name": "Cykly for a while",
+      "file": "reseni.py",
+      "checks": [
+        {
+          "id": "prirozena",
+          "description": "`prirozena` je seznam prvních 10 přirozených čísel",
+          "type": "py.eval",
+          "expr": "prirozena",
+          "expected": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "hint": "Začněte prázdným seznamem `[]` a v cyklu `for i in range(…):` přidávejte `append(i)`; hodnota `stop` se do `range()` nezahrne (kapitola Vsuvka – funkce range())."
+        },
+        {
+          "id": "licha",
+          "description": "`licha` je seznam lichých čísel od 1 do 19",
+          "type": "py.eval",
+          "expr": "licha",
+          "expected": [
+            1,
+            3,
+            5,
+            7,
+            9,
+            11,
+            13,
+            15,
+            17,
+            19
+          ],
+          "hint": "Třetí parametr `range(start, stop, step)` je krok (kapitola Vsuvka – funkce range())."
+        },
+        {
+          "id": "odpocet",
+          "description": "`odpocet` je seznam čísel od 10 do 1",
+          "type": "py.eval",
+          "expr": "odpocet",
+          "expected": [
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1
+          ],
+          "hint": "Se záporným krokem `range(start, stop, -1)` čísla klesají; `stop` se nezahrne (kapitola Vsuvka – funkce range())."
+        },
+        {
+          "id": "soucet",
+          "description": "`soucet` je součet čísel od 1 do `n`",
+          "type": "py.eval",
+          "expr": "soucet",
+          "expected": 5050,
+          "hint": "Před cyklem `soucet = 0`, v cyklu `soucet += i`; nezapomeňte, že i samotné `n` patří do součtu (kapitola Cyklus for)."
+        },
+        {
+          "id": "delka",
+          "description": "`delka` je počet znaků textu `text` spočítaný cyklem",
+          "type": "py.eval",
+          "expr": "delka",
+          "expected": 13,
+          "hint": "`for znak in text:` projde text znak po znaku, v každé iteraci přičtěte 1 (kapitola Cyklus for – procházení textu)."
+        },
+        {
+          "id": "ocislovane",
+          "description": "`ocislovane` je seznam ovoce s pořadím ve tvaru „1. jablko“",
+          "type": "py.eval",
+          "expr": "ocislovane",
+          "expected": [
+            "1. jablko",
+            "2. banán",
+            "3. třešeň"
+          ],
+          "hint": "`for poradi, kus in enumerate(seznam, start=1):` a text složte f-stringem `f\"{poradi}. {kus}\"` (kapitola Cyklus for – když potřebuji i pořadí)."
+        },
+        {
+          "id": "vyprodano",
+          "description": "`vyprodano` je seznam zboží ze `sklad`, kterého je 0 kusů",
+          "type": "py.eval",
+          "expr": "vyprodano",
+          "expected": [
+            "hrušky",
+            "meruňky"
+          ],
+          "hint": "`for klic, hodnota in slovnik.items():` vrací dvojice klíč–hodnota, do seznamu přidejte jen klíče s hodnotou 0 (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "celkem-bodu",
+          "description": "`celkem_bodu` je součet bodů všech žáků ze `body`",
+          "type": "py.eval",
+          "expr": "celkem_bodu",
+          "expected": 375,
+          "hint": "`for hodnota in slovnik.values():` prochází jen hodnoty; před cyklem `celkem_bodu = 0` (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "nejlepsi",
+          "description": "`nejlepsi` je jméno žáka s nejvíce body",
+          "type": "py.eval",
+          "expr": "nejlepsi",
+          "expected": "Dana",
+          "hint": "V cyklu přes `.items()` si pamatujte dosud nejlepší jméno a jeho body a přepište je, když najdete víc (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "prospeli",
+          "description": "`prospeli` je seznam jmen žáků s alespoň 60 body",
+          "type": "py.eval",
+          "expr": "prospeli",
+          "expected": [
+            "Adam",
+            "Bára",
+            "Cyril",
+            "Dana"
+          ],
+          "hint": "`for jmeno, pocet in slovnik.items():` a do seznamu přidejte jen jména splňující podmínku (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "cenik-dph",
+          "description": "`cenik_dph` je nový slovník cen zvýšených o 21 % DPH",
+          "type": "py.eval",
+          "expr": "cenik_dph",
+          "expected": {
+            "chléb": 48.4,
+            "mléko": 30.25,
+            "máslo": 72.6
+          },
+          "hint": "Začněte prázdným slovníkem `{}` a v cyklu přiřazujte `novy[klic] = hodnota`; původní `cenik` neměňte (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "cetnost",
+          "description": "`cetnost` je slovník, kolikrát se které slovo ve `veta` opakuje",
+          "type": "py.eval",
+          "expr": "cetnost",
+          "expected": {
+            "jablko": 3,
+            "hruška": 2,
+            "švestka": 1
+          },
+          "hint": "Text rozdělíte na slova `veta.split()`; počet zvýšíte `slovnik[slovo] = slovnik.get(slovo, 0) + 1` (kapitola Cyklus for – procházení kolekcí)."
+        },
+        {
+          "id": "prumery",
+          "description": "`prumery` je slovník jméno → průměrná známka žáka ze `znamky`",
+          "type": "py.eval",
+          "expr": "prumery",
+          "expected": {
+            "Adam": 2,
+            "Bára": 1,
+            "Cyril": 3
+          },
+          "hint": "Hodnota ve slovníku je seznam; vnějším cyklem projděte `.items()`, vnitřním sečtěte známky a vydělte počtem `len()` (kapitola Vnořené cykly)."
+        },
+        {
+          "id": "vzor",
+          "description": "`vzor` je seznam řádků „1“, „1 2“ až „1 2 3 4 5“",
+          "type": "py.eval",
+          "expr": "vzor",
+          "expected": [
+            "1",
+            "1 2",
+            "1 2 3",
+            "1 2 3 4",
+            "1 2 3 4 5"
+          ],
+          "hint": "Vnější cyklus určuje řádek, vnitřní k němu skládá čísla; řádek je text bez mezery na konci, číslo převedete `str(cislo)` (kapitola Vnořené cykly)."
+        },
+        {
+          "id": "break",
+          "description": "`prvni_zaporna` je první záporná hodnota v `teploty`",
+          "type": "py.eval",
+          "expr": "prvni_zaporna",
+          "expected": -2,
+          "hint": "Po nalezení první záporné hodnoty cyklus ukončete příkazem `break`, jinak ji přepíše další (kapitola break)."
+        },
+        {
+          "id": "continue",
+          "description": "`platna` je seznam měření bez chybějících hodnot `-1`",
+          "type": "py.eval",
+          "expr": "platna",
+          "expected": [
+            12,
+            15,
+            9,
+            14
+          ],
+          "hint": "`if hodnota == -1: continue` přeskočí zbytek těla cyklu, `append` se pak provede jen pro platné hodnoty (kapitola continue)."
+        },
+        {
+          "id": "for-else",
+          "description": "`zprava` hlásí, že hledané jméno ve třídě není",
+          "type": "py.eval",
+          "expr": "zprava",
+          "expected": "Eva ve třídě není",
+          "hint": "Při nálezu nastavte zprávu a `break`; větev `else:` za cyklem (na úrovni `for`) se provede jen bez `break` (kapitola else u cyklu)."
+        },
+        {
+          "id": "mocniny",
+          "description": "`mocniny` je seznam druhých mocnin od 1 do 81",
+          "type": "py.eval",
+          "expr": "mocniny",
+          "expected": [
+            1,
+            4,
+            9,
+            16,
+            25,
+            36,
+            49,
+            64,
+            81
+          ],
+          "hint": "`while podminka:` opakuje, dokud podmínka platí; v těle zvyšujte číslo `cislo += 1`, jinak cyklus nikdy neskončí (kapitola Cyklus while)."
+        },
+        {
+          "id": "tydny",
+          "description": "`tydny` je počet týdnů spoření, než naspoříte alespoň `cil`",
+          "type": "py.eval",
+          "expr": "tydny",
+          "expected": 7,
+          "hint": "Dokud je naspořeno méně než `cil`, přičtěte týdenní částku a počet týdnů zvyšte o 1 (kapitola Cyklus while – neznámý počet opakování)."
+        },
+        {
+          "id": "uses-for",
+          "description": "V programu je použit cyklus `for`",
+          "type": "py.uses",
+          "any_of": [
+            "for"
+          ],
+          "hint": "Výsledky úkolů 1–17 vytvořte cyklem `for prvek in posloupnost:`, ne opsáním hodnot (kapitola Cyklus for)."
+        },
+        {
+          "id": "uses-while",
+          "description": "V programu je použit cyklus `while`",
+          "type": "py.uses",
+          "any_of": [
+            "while"
+          ],
+          "hint": "Úkoly 18 a 19 řešte cyklem `while podminka:` (kapitola Cyklus while)."
+        }
+      ]
+    }
+  ]
+}
