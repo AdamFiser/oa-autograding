@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.11.1
+pip install git+https://github.com/adamfiser/oa-autograding@2026.11.2
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
