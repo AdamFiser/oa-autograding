@@ -1,6 +1,7 @@
-"""Kontroly nad soubory: existence a nepřítomnost značek (TODO)."""
+"""Kontroly nad soubory: existence, nepřítomnost značek (TODO), otisk obsahu a zakázané soubory."""
 from __future__ import annotations
 
+import hashlib
 from typing import Any
 
 from oa_autograding.checks.base import CheckContext, CheckResult, register
@@ -49,3 +50,32 @@ def file_contains(ctx: CheckContext, params: dict[str, Any]) -> CheckResult:
     if count >= need:
         return CheckResult(True)
     return CheckResult(False, f"`{text}` je v souboru na {count} řádcích, požadováno alespoň {need}.")
+
+
+@register("file.sha256")
+def file_sha256(ctx: CheckContext, params: dict[str, Any]) -> CheckResult:
+    """Soubor je bajtově shodný s originálem (SHA-256 v `sha256`)."""
+    expected = str(params.get("sha256", "")).strip().lower()
+    if not expected:
+        return CheckResult(False, "Kontrola nemá zadaný `sha256` (chyba v checks.json).")
+    assert ctx.file is not None
+    actual = hashlib.sha256(ctx.file.read_bytes()).hexdigest()
+    if actual == expected:
+        return CheckResult(True)
+    return CheckResult(
+        False,
+        f"Soubor `{_rel(ctx)}` se liší od zadání. Vraťte jeho původní obsah ze šablony.",
+        f"sha256 {actual}, očekáváno {expected}",
+    )
+
+
+@register("file.absent", needs_file=False)
+def file_absent(ctx: CheckContext, params: dict[str, Any]) -> CheckResult:
+    """Žádná z cest v `paths` (soubor ani adresář) v repozitáři není."""
+    paths = params.get("paths")
+    if not isinstance(paths, list) or not paths or not all(isinstance(p, str) and p for p in paths):
+        return CheckResult(False, "Kontrola nemá zadaný seznam `paths` (chyba v checks.json).")
+    found = [p for p in paths if (ctx.repo_root / p).exists() or (ctx.repo_root / p).is_symlink()]
+    if not found:
+        return CheckResult(True)
+    return CheckResult(False, "V repozitáři nesmí být: " + ", ".join(f"`{p}`" for p in found) + ". Odstraňte je.")
