@@ -121,8 +121,8 @@ def _parse_check(raw: Any, where: str, prefix: str | None, number: int) -> Check
     if not is_registered(ctype):
         raise SpecError(f"{where}.type: neznámý typ kontroly {ctype!r}")
     points = raw.get("points", 1)
-    if isinstance(points, bool) or not isinstance(points, int) or points < 1:
-        raise SpecError(f"{where}.points: musí být celé číslo >= 1")
+    if isinstance(points, bool) or not isinstance(points, int) or points < 0:
+        raise SpecError(f"{where}.points: musí být celé číslo >= 0 (0 = nebodovaná kontrola)")
     return Check(
         id=_req_str(raw, "id", where),
         label=f"{prefix}{number}" if prefix else str(number),

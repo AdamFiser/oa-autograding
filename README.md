@@ -36,7 +36,7 @@ nápověda, historie odevzdání).
 ```
 
 - `tasks` = bloky s vlastním součtem bodů; `prefix` dává číslování `A1, A2…`.
-- `points` (výchozí 1) je váha požadavku; `hint` je pevná nápověda, kontrola
+- `points` (výchozí 1) je váha požadavku, `0` = nebodovaný (jen informativní) požadavek; `hint` je pevná nápověda, kontrola
   k ní přidá konkrétní důvod; `docs` je kotva/URL připojená k `docs` z hlavičky.
 - `file` bloku je výchozí soubor kontrol, kontrola ho může přepsat.
 
@@ -205,6 +205,44 @@ Datové struktury pokrývají `examples/py_03_list` (25 požadavků v pěti
 souborech), `examples/py_04_tuple` (14, včetně `run` se `stdin`)
 a `examples/py_05_dict` (13) — šablony `oa-pva2-Syllabus/Py_03_DatoveStruktury_List`,
 `…_Tuple` a `…_Dictionary`; kostra dá 0 bodů, řešení plný počet.
+
+### Prostředí bez AI (nebodovaný blok)
+
+Šablony v `OA-PVA2-Syllabus`, `OA-PVA4-Syllabus` a `oa-scm-syllabus` obsahují
+`.noai` (vypíná JetBrains AI Assistant a Junie) a `.vscode/settings.json`
+(vypíná Copilot, chat a inline návrhy). Nově registrované cvičení k nim přidá
+nebodovaný blok — body nemění, žák jen vidí stav. Do cvičení, která žáci už
+přijali, ho nepřidávej: jejich repa soubory nemají.
+
+```json
+{
+  "id": "prostredi-bez-ai",
+  "name": "Prostředí bez AI (nebodováno)",
+  "prefix": "Z",
+  "checks": [
+    {"id": "noai", "description": "V kořeni repozitáře je soubor `.noai`",
+     "type": "file.exists", "file": ".noai", "points": 0,
+     "hint": "Soubor `.noai` je součástí zadání, nemažte ho."},
+    {"id": "vscode-settings", "description": "`.vscode/settings.json` je beze změny",
+     "type": "file.sha256", "file": ".vscode/settings.json",
+     "sha256": "4d1132992b696deeb490f0d54f2ac4fb57b02bfeb65d7894a9b39462a4d07573", "points": 0,
+     "hint": "Nastavení editoru je součástí zadání, neupravujte ho."},
+    {"id": "bez-ai-souboru", "description": "V repozitáři nejsou konfigurační soubory AI asistentů",
+     "type": "file.absent", "points": 0,
+     "paths": ["CLAUDE.md", ".claude", "GEMINI.md", ".gemini", "AGENTS.md", ".cursor", ".cursorrules",
+               ".windsurfrules", ".github/copilot-instructions.md", ".continue", ".clinerules"],
+     "hint": "Cvičení se vypracovává bez AI asistentů."}
+  ]
+}
+```
+
+| Typ | Co ověří | Parametry |
+|---|---|---|
+| `file.sha256` | soubor z `file` je bajtově shodný s originálem | `sha256` |
+| `file.absent` | žádná z cest (soubor ani adresář) v repozitáři není | `paths` |
+
+Hash platí pro `settings.json` se společným obsahem všech šablon (LF). Změní-li
+se obsah souboru, přepočítej ho: `git show HEAD:.vscode/settings.json | sha256sum`.
 
 ## Vývoj
 

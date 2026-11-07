@@ -47,3 +47,35 @@ def test_no_marker_still_sees_markers_in_comments(repo):
     repo.write("a.md", "<!-- TODO 1 -->\n")
     ctx = CheckContext.for_file(repo.root, "a.md")
     assert not base.get("file.no-marker").fn(ctx, {}).passed
+
+
+def test_sha256_pass_and_fail(repo):
+    import hashlib
+    repo.write(".vscode/settings.json", "").write_bytes(b'{"a": 1}\n')  # bez převodu konců řádků
+    h = hashlib.sha256(b'{"a": 1}\n').hexdigest()
+    ctx = CheckContext.for_file(repo.root, ".vscode/settings.json")
+    assert base.get("file.sha256").fn(ctx, {"sha256": h.upper()}).passed
+    res = base.get("file.sha256").fn(ctx, {"sha256": "0" * 64})
+    assert not res.passed and "`.vscode/settings.json`" in res.reason
+
+
+def test_sha256_without_hash(repo):
+    repo.write("a.txt", "x")
+    res = base.get("file.sha256").fn(CheckContext.for_file(repo.root, "a.txt"), {})
+    assert not res.passed and "checks.json" in res.reason
+
+
+def test_absent_pass_and_fail(repo):
+    reg = base.get("file.absent")
+    assert reg.needs_file is False
+    paths = ["CLAUDE.md", ".cursor", ".github/copilot-instructions.md"]
+    assert reg.fn(CheckContext(repo.root, None), {"paths": paths}).passed
+    repo.write(".cursor/rules.md", "x")
+    repo.write("CLAUDE.md", "x")
+    res = reg.fn(CheckContext(repo.root, None), {"paths": paths})
+    assert not res.passed and "`CLAUDE.md`" in res.reason and "`.cursor`" in res.reason
+
+
+def test_absent_without_paths(repo):
+    res = base.get("file.absent").fn(CheckContext(repo.root, None), {})
+    assert not res.passed and "checks.json" in res.reason

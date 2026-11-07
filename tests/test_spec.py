@@ -66,7 +66,7 @@ def test_resolve_docs():
     (lambda d: d.pop("title"), "title"),
     (lambda d: d.update(tasks=[]), "tasks"),
     (lambda d: d["tasks"][0]["checks"][0].update(type="t.zzz"), "neznámý typ"),
-    (lambda d: d["tasks"][0]["checks"][0].update(points=0), "points"),
+    (lambda d: d["tasks"][0]["checks"][0].update(points=-1), "points"),
     (lambda d: d["tasks"][0]["checks"][0].update(points=True), "points"),
     (lambda d: d["tasks"][0]["checks"][1].update(id="one"), "duplicit"),
     (lambda d: d["tasks"][1].update(id="ukol-a"), "duplicit"),
@@ -89,3 +89,10 @@ def test_load_spec_errors(tmp_path):
     ok = tmp_path / "ok.json"
     ok.write_text("﻿" + json.dumps(minimal(), ensure_ascii=False), encoding="utf-8")
     assert load_spec(ok).title == "Cvičení"
+
+
+def test_zero_points_allowed():
+    d = minimal()
+    d["tasks"][0]["checks"][0]["points"] = 0
+    s = parse_spec(d)
+    assert s.tasks[0].checks[0].points == 0
