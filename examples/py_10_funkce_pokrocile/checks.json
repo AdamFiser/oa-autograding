@@ -635,8 +635,494 @@
           "hint": "Seznam jako výchozí hodnota se vytvoří jen jednou; použijte `kosik: list[str] | None = None` a prázdný seznam vytvořte uvnitř funkce (kapitola Past - seznam jako výchozí hodnota)."
         },
         {
+          "id": "odeber",
+          "description": "`odeberZKosiku(kosik, zbozi)` odebere první výskyt zboží z předaného košíku a vrátí, zda něco odebrala",
+          "type": "py.function",
+          "name": "odeberZKosiku",
+          "cases": [
+            {
+              "args": [
+                [
+                  "tričko",
+                  "mikina",
+                  "tričko"
+                ],
+                "tričko"
+              ],
+              "expected": true,
+              "args_after": [
+                [
+                  "mikina",
+                  "tričko"
+                ],
+                "tričko"
+              ]
+            },
+            {
+              "args": [
+                [
+                  "tričko"
+                ],
+                "čepice"
+              ],
+              "expected": false,
+              "args_after": [
+                [
+                  "tričko"
+                ],
+                "čepice"
+              ]
+            }
+          ],
+          "hint": "Funkce mění předaný seznam metodou `remove()`, která odebere první výskyt; předtím ověřte `in`, jinak `remove()` skončí chybou (kapitola Seznam jako argument)."
+        },
+        {
+          "id": "souhrn",
+          "description": "`souhrnKosiku(kosik)` vrátí slovník s počtem kusů každého zboží",
+          "type": "py.function",
+          "name": "souhrnKosiku",
+          "cases": [
+            {
+              "args": [
+                [
+                  "tričko",
+                  "mikina",
+                  "tričko"
+                ]
+              ],
+              "expected": {
+                "tričko": 2,
+                "mikina": 1
+              }
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": {}
+            }
+          ],
+          "hint": "Založte prázdný slovník `{}` a v cyklu zvyšujte počet u klíče, pro nový klíč začněte jedničkou nebo použijte `slovnik.get(klic, 0)`."
+        },
+        {
+          "id": "cena-kosiku",
+          "description": "`cenaKosiku(kosik, cenik)` vrátí součet cen zboží v košíku, zboží mimo ceník se nezapočítá",
+          "type": "py.function",
+          "name": "cenaKosiku",
+          "cases": [
+            {
+              "args": [
+                [
+                  "tričko",
+                  "mikina",
+                  "tričko"
+                ],
+                {
+                  "tričko": 250,
+                  "mikina": 690
+                }
+              ],
+              "expected": 1190
+            },
+            {
+              "args": [
+                [
+                  "tričko",
+                  "mikina",
+                  "tričko",
+                  "ponožky"
+                ],
+                {
+                  "tričko": 250,
+                  "mikina": 690
+                }
+              ],
+              "expected": 1190
+            },
+            {
+              "args": [
+                [],
+                {
+                  "tričko": 250,
+                  "mikina": 690
+                }
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Cenu zboží najdete v ceníku `cenik[zbozi]`; zda zboží v ceníku je, ověřte předem operátorem `in`."
+        },
+        {
+          "id": "cena-objednavky",
+          "description": "`cenaObjednavky(cenaZbozi, slevaProcent, doprava)` započte slevu v % a dopravu, od 1500 Kč po slevě je doprava zdarma",
+          "type": "py.function",
+          "name": "cenaObjednavky",
+          "cases": [
+            {
+              "args": [
+                1000
+              ],
+              "expected": 1099
+            },
+            {
+              "args": [
+                1000,
+                10
+              ],
+              "expected": 999
+            },
+            {
+              "args": [
+                2000
+              ],
+              "expected": 2000
+            },
+            {
+              "args": [
+                1600,
+                10
+              ],
+              "expected": 1539
+            },
+            {
+              "args": [
+                1000,
+                0,
+                0
+              ],
+              "expected": 1000
+            },
+            {
+              "args": [
+                1999.99,
+                25
+              ],
+              "expected": 1598.99
+            }
+          ],
+          "hint": "Nejdřív odečtěte slevu `cenaZbozi * slevaProcent / 100`, pak rozhodněte o dopravě a výsledek zaokrouhlete `round(cena, 2)` (kapitola Výchozí hodnota parametru)."
+        },
+        {
           "id": "anotace",
-          "description": "Funkce v `kosik.py` mají typové anotace",
+          "description": "Všechny funkce v `kosik.py` mají typové anotace",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace)."
+        }
+      ]
+    },
+    {
+      "id": "rodne-cislo",
+      "name": "Rodné číslo",
+      "prefix": "E",
+      "file": "rodne_cislo.py",
+      "checks": [
+        {
+          "id": "zena",
+          "description": "`jeZena(rc)` vrátí `True` pro rodné číslo ženy",
+          "type": "py.function",
+          "name": "jeZena",
+          "cases": [
+            {
+              "args": [
+                "905704/1235"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "850315/1239"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "107201/1237"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "053130/1232"
+              ],
+              "expected": false
+            }
+          ],
+          "hint": "Měsíc jsou třetí a čtvrtá číslice, řez `rc[2:4]` převeďte `int()`; ženy mají měsíc zvýšený o 50, tedy větší než 50."
+        },
+        {
+          "id": "pocet-dni",
+          "description": "`pocetDni(rok, mesic)` vrátí počet dní v měsíci včetně přestupného roku",
+          "type": "py.function",
+          "name": "pocetDni",
+          "cases": [
+            {
+              "args": [
+                2024,
+                2
+              ],
+              "expected": 29
+            },
+            {
+              "args": [
+                2023,
+                2
+              ],
+              "expected": 28
+            },
+            {
+              "args": [
+                1900,
+                2
+              ],
+              "expected": 28
+            },
+            {
+              "args": [
+                2000,
+                2
+              ],
+              "expected": 29
+            },
+            {
+              "args": [
+                2023,
+                4
+              ],
+              "expected": 30
+            },
+            {
+              "args": [
+                2023,
+                12
+              ],
+              "expected": 31
+            }
+          ],
+          "hint": "Přestupný je rok dělitelný 4, kromě roků dělitelných 100, které nejsou dělitelné 400: `rok % 4 == 0 and (rok % 100 != 0 or rok % 400 == 0)`."
+        },
+        {
+          "id": "datum",
+          "description": "`datumNarozeni(rc)` vrátí datum narození jako n-tici (rok, měsíc, den)",
+          "type": "py.function",
+          "name": "datumNarozeni",
+          "cases": [
+            {
+              "args": [
+                "850315/1239"
+              ],
+              "expected": [
+                1985,
+                3,
+                15
+              ]
+            },
+            {
+              "args": [
+                "9057041235"
+              ],
+              "expected": [
+                1990,
+                7,
+                4
+              ]
+            },
+            {
+              "args": [
+                "107201/1237"
+              ],
+              "expected": [
+                2010,
+                2,
+                1
+              ]
+            },
+            {
+              "args": [
+                "053130/1232"
+              ],
+              "expected": [
+                2005,
+                11,
+                30
+              ]
+            },
+            {
+              "args": [
+                "450808/123"
+              ],
+              "expected": [
+                1945,
+                8,
+                8
+              ]
+            },
+            {
+              "args": [
+                "736028/1236"
+              ],
+              "expected": [
+                1973,
+                10,
+                28
+              ]
+            }
+          ],
+          "points": 2,
+          "hint": "Lomítko odstraňte `replace(\"/\", \"\")`, od měsíce postupně odečtěte 50 a pak 20, je-li větší; století určete podle délky čísla a dvojčíslí roku. Zápis rodného čísla a pravidla najdete v `rodne_cislo.md`."
+        },
+        {
+          "id": "platne",
+          "description": "`jePlatneRodneCislo(rc)` ověří formát, délku podle roku narození a kontrolní číslici",
+          "type": "py.function",
+          "name": "jePlatneRodneCislo",
+          "cases": [
+            {
+              "args": [
+                "850315/1239"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "9057041235"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "450808/123"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "850315/1020"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "850315/1234"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "850315/123"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "85031512a9"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "850315/12391"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "850315/1021"
+              ],
+              "expected": false
+            }
+          ],
+          "hint": "Desetimístné číslo musí být dělitelné 11: `int(cislo) % 11 == 0`; výjimkou je zbytek 10 z prvních devíti číslic, pak je kontrolní číslice 0. Zápis rodného čísla a pravidla najdete v `rodne_cislo.md`."
+        },
+        {
+          "id": "platne-datum",
+          "description": "`jePlatneRodneCislo(rc)` odmítne rodné číslo s neexistujícím datem",
+          "type": "py.function",
+          "name": "jePlatneRodneCislo",
+          "cases": [
+            {
+              "args": [
+                "850431/1233"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "851315/1230"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "000229/123"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "005229/1239"
+              ],
+              "expected": true
+            }
+          ],
+          "hint": "Využijte vlastní funkce: `datumNarozeni()` dá rok, měsíc a den, `pocetDni()` řekne, kolik dní měsíc má; měsíc musí být 1 až 12."
+        },
+        {
+          "id": "vek",
+          "description": "`vek(rc, rok, mesic, den)` vrátí věk člověka k zadanému datu",
+          "type": "py.function",
+          "name": "vek",
+          "cases": [
+            {
+              "args": [
+                "850315/1239",
+                2026,
+                11,
+                15
+              ],
+              "expected": 41
+            },
+            {
+              "args": [
+                "850315/1239",
+                2026,
+                3,
+                14
+              ],
+              "expected": 40
+            },
+            {
+              "args": [
+                "850315/1239",
+                2026,
+                3,
+                15
+              ],
+              "expected": 41
+            },
+            {
+              "args": [
+                "107201/1237",
+                2026,
+                1,
+                31
+              ],
+              "expected": 15
+            },
+            {
+              "args": [
+                "107201/1237",
+                2026,
+                2,
+                1
+              ],
+              "expected": 16
+            }
+          ],
+          "hint": "Od rozdílu roků odečtěte 1, pokud narozeniny v daném roce ještě nebyly; n-tice se porovnávají prvek po prvku: `(mesic, den) < (mesicNarozeni, denNarozeni)`."
+        },
+        {
+          "id": "anotace",
+          "description": "Všechny funkce v `rodne_cislo.py` mají typové anotace",
           "type": "py.signature",
           "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace)."
         }

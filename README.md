@@ -208,8 +208,8 @@ a `examples/py_05_dict` (13) — šablony `oa-pva2-Syllabus/Py_03_DatoveStruktur
 `…_Tuple` a `…_Dictionary`; kostra dá 0 bodů, řešení plný počet.
 Funkce pokrývají `examples/py_09_funkce` (šablona `oa-pva2-Syllabus/Py_09_Funkce`, 14 požadavků
 za 15 bodů včetně výpisu funkce, změny předaného seznamu a anotací) a
-`examples/py_10_funkce_pokrocile` (`…/Py_10_Funkce_pokrocile`, 15 požadavků za 16 bodů ve čtyřech
-souborech, mezi nimi past s měnitelnou výchozí hodnotou); kostra dá 0 bodů, řešení plný počet.
+`examples/py_10_funkce_pokrocile` (`…/Py_10_Funkce_pokrocile`, 25 požadavků za 28 bodů v pěti
+souborech, mezi nimi past s měnitelnou výchozí hodnotou a rodné číslo); kostra dá 0 bodů, řešení plný počet.
 
 ### Prostředí bez AI (nebodovaný blok)
 

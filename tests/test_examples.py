@@ -92,7 +92,7 @@ def test_php06_reseni_passes_everything():
 
 
 PY_DATA_EXAMPLES = [("py_03_list", 25), ("py_04_tuple", 14), ("py_05_dict", 13), ("py_06_cykly", 21),
-                     ("py_09_funkce", 15), ("py_10_funkce_pokrocile", 16)]
+                     ("py_09_funkce", 15), ("py_10_funkce_pokrocile", 28)]
 
 
 @pytest.mark.parametrize(("name", "points"), PY_DATA_EXAMPLES)
