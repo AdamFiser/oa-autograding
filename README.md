@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.11.2
+pip install git+https://github.com/adamfiser/oa-autograding@2026.11.3
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -189,7 +189,8 @@ pracují nad souborem z `file`:
 | Typ | Co ověří | Parametry |
 |---|---|---|
 | `py.eval` | hodnotu výrazu **včetně typu** (`"5"` ≠ `5`, `True` ≠ `1`; int/float zaměnitelné) | `expr`, `expected`, `timeout` |
-| `py.function` | že některá funkce ze souboru vrátí pro všechny vstupy očekávané hodnoty (název se neurčuje — hledá se chováním; slovník se zkusí předat i jako `f(**slovnik)`) | `cases: [{"args": [...], "expected": …}]`, `name`, `timeout` |
+| `py.function` | že některá funkce ze souboru vrátí pro všechny vstupy očekávané hodnoty (název se neurčuje — hledá se chováním; slovník se zkusí předat i jako `f(**slovnik)`); případ může navíc chtít přesný výpis funkce (`stdout`) a stav pozičních argumentů po zavolání (`args_after`, pro funkce měnící předaný seznam). Případy běží za sebou nad toutéž funkcí, takže se projeví i past s měnitelnou výchozí hodnotou | `cases: [{"args": [...], "expected": …, "stdout": "…", "args_after": [...]}]`, `name`, `timeout` |
+| `py.signature` | statickou analýzou, že funkce `name` (bez něj všechny funkce v souboru, aspoň jedna) mají typové anotace u všech parametrů i návratový typ, případně docstring | `name`, `annotations` (`true`), `docstring` (`false`) |
 | `py.uses` | statickou analýzou (AST), že kód používá aspoň jednu z konstrukcí | `any_of`: `for`, `while`, `def`, `fstring`, `comprehension`, `dict-lookup`, `in-collection`, `dict-get-default`, `default-param`, `sort-key` |
 | `file.contains` | že text (bez ohledu na mezery a velikost písmen) je aspoň na `min_count` řádcích — např. komentáře `# OPRAVA:` | `text`, `min_count` |
 
@@ -205,6 +206,10 @@ Datové struktury pokrývají `examples/py_03_list` (25 požadavků v pěti
 souborech), `examples/py_04_tuple` (14, včetně `run` se `stdin`)
 a `examples/py_05_dict` (13) — šablony `oa-pva2-Syllabus/Py_03_DatoveStruktury_List`,
 `…_Tuple` a `…_Dictionary`; kostra dá 0 bodů, řešení plný počet.
+Funkce pokrývají `examples/py_09_funkce` (šablona `oa-pva2-Syllabus/Py_09_Funkce`, 14 požadavků
+za 15 bodů včetně výpisu funkce, změny předaného seznamu a anotací) a
+`examples/py_10_funkce_pokrocile` (`…/Py_10_Funkce_pokrocile`, 15 požadavků za 16 bodů ve čtyřech
+souborech, mezi nimi past s měnitelnou výchozí hodnotou); kostra dá 0 bodů, řešení plný počet.
 
 ### Prostředí bez AI (nebodovaný blok)
 

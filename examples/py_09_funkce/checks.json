@@ -1,0 +1,458 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 09: Funkce",
+  "tasks": [
+    {
+      "id": "funkce",
+      "name": "Funkce",
+      "file": "reseni.py",
+      "checks": [
+        {
+          "id": "pozdrav",
+          "description": "`pozdrav()` vypíše `Hello world` a nic nevrací",
+          "type": "py.function",
+          "name": "pozdrav",
+          "cases": [
+            {
+              "args": [],
+              "expected": null,
+              "stdout": "Hello world\n"
+            }
+          ],
+          "hint": "Funkce jen vypisuje: v těle je `print(…)` a žádný `return`, hlavička končí `-> None` (kapitola Funkce bez return vrací None)."
+        },
+        {
+          "id": "pozdrav-krat",
+          "description": "`pozdravKrat(pocet)` vypíše `Hello world` tolikrát, kolik je `pocet`",
+          "type": "py.function",
+          "name": "pozdravKrat",
+          "cases": [
+            {
+              "args": [
+                3
+              ],
+              "expected": null,
+              "stdout": "Hello world\nHello world\nHello world\n"
+            },
+            {
+              "args": [
+                1
+              ],
+              "expected": null,
+              "stdout": "Hello world\n"
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": null,
+              "stdout": ""
+            }
+          ],
+          "hint": "V těle je cyklus `for … in range(pocet):` a v něm volání `pozdrav()` (kapitola Volání funkce)."
+        },
+        {
+          "id": "druha-mocnina",
+          "description": "`druhaMocnina(cislo)` vrátí druhou mocninu čísla",
+          "type": "py.function",
+          "name": "druhaMocnina",
+          "cases": [
+            {
+              "args": [
+                4
+              ],
+              "expected": 16
+            },
+            {
+              "args": [
+                8
+              ],
+              "expected": 64
+            },
+            {
+              "args": [
+                -1
+              ],
+              "expected": 1
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Výsledek předejte přes `return`, nevypisujte ho (kapitola return a print nejsou totéž)."
+        },
+        {
+          "id": "soucet-dvou",
+          "description": "`soucetDvou(a, b)` vrátí součet dvou čísel",
+          "type": "py.function",
+          "name": "soucetDvou",
+          "cases": [
+            {
+              "args": [
+                2,
+                4
+              ],
+              "expected": 6
+            },
+            {
+              "args": [
+                1.5,
+                2.5
+              ],
+              "expected": 4.0
+            },
+            {
+              "args": [
+                -3,
+                3
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Funkce má dva parametry a výsledek vrací přes `return` (kapitola Parametr a argument)."
+        },
+        {
+          "id": "vypocet",
+          "description": "`vypocet(a, b, c)` vrátí `a * b + c`, `b` je nepovinné s výchozí hodnotou 2 a `c` s výchozí hodnotou 10",
+          "type": "py.function",
+          "name": "vypocet",
+          "cases": [
+            {
+              "args": [
+                3,
+                5,
+                20
+              ],
+              "expected": 35
+            },
+            {
+              "args": [
+                3,
+                5
+              ],
+              "expected": 25
+            },
+            {
+              "args": [
+                3
+              ],
+              "expected": 16
+            }
+          ],
+          "hint": "Nepovinný parametr má výchozí hodnotu `nazev: typ = hodnota` a stojí až za povinnými (kapitola Výchozí hodnota parametru)."
+        },
+        {
+          "id": "je-sude",
+          "description": "`jeSude(cislo)` vrátí `True` pro sudé číslo, jinak `False`",
+          "type": "py.function",
+          "name": "jeSude",
+          "cases": [
+            {
+              "args": [
+                4
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                7
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                -3
+              ],
+              "expected": false
+            }
+          ],
+          "hint": "Porovnání samo vrací `True` nebo `False`, stačí `return podmínka`; zbytek po dělení dává operátor `%` (kapitola Funkce, které vracejí True nebo False)."
+        },
+        {
+          "id": "min-max",
+          "description": "`minMax(cisla)` vrátí dvojici (nejmenší číslo, největší číslo)",
+          "type": "py.function",
+          "name": "minMax",
+          "cases": [
+            {
+              "args": [
+                [
+                  3,
+                  1,
+                  2
+                ]
+              ],
+              "expected": [
+                1,
+                3
+              ]
+            },
+            {
+              "args": [
+                [
+                  5
+                ]
+              ],
+              "expected": [
+                5,
+                5
+              ]
+            },
+            {
+              "args": [
+                [
+                  -4,
+                  10,
+                  0,
+                  -7
+                ]
+              ],
+              "expected": [
+                -7,
+                10
+              ]
+            }
+          ],
+          "hint": "Dvě hodnoty vrátíte zápisem `return prvni, druha`, vznikne n-tice (kapitola Vrácení více hodnot)."
+        },
+        {
+          "id": "pridej-unikatni",
+          "description": "`pridejUnikatni(seznam, prvek)` přidá prvek do předaného seznamu, jen pokud v něm ještě není, a nic nevrací",
+          "type": "py.function",
+          "name": "pridejUnikatni",
+          "cases": [
+            {
+              "args": [
+                [
+                  "red",
+                  "green"
+                ],
+                "blue"
+              ],
+              "expected": null,
+              "args_after": [
+                [
+                  "red",
+                  "green",
+                  "blue"
+                ],
+                "blue"
+              ]
+            },
+            {
+              "args": [
+                [
+                  "red",
+                  "green"
+                ],
+                "red"
+              ],
+              "expected": null,
+              "args_after": [
+                [
+                  "red",
+                  "green"
+                ],
+                "red"
+              ]
+            }
+          ],
+          "hint": "Funkce mění předaný seznam metodou `append()` a nic nevrací; zda prvek v seznamu je, zjistíte operátorem `in` (kapitola Seznam jako argument)."
+        },
+        {
+          "id": "bez-duplicit",
+          "description": "`bezDuplicit(seznam)` vrátí nový seznam bez opakujících se prvků v původním pořadí a předaný seznam nezmění",
+          "type": "py.function",
+          "name": "bezDuplicit",
+          "cases": [
+            {
+              "args": [
+                [
+                  "red",
+                  "green",
+                  "red",
+                  "black",
+                  "green"
+                ]
+              ],
+              "expected": [
+                "red",
+                "green",
+                "black"
+              ],
+              "args_after": [
+                [
+                  "red",
+                  "green",
+                  "red",
+                  "black",
+                  "green"
+                ]
+              ]
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": []
+            }
+          ],
+          "hint": "Založte prázdný seznam `vysledek = []`, přidávejte do něj jen prvky, které v něm ještě nejsou, a ten vraťte (kapitola Seznam jako argument)."
+        },
+        {
+          "id": "soucet-vybranych",
+          "description": "`soucetVybranych(cisla)` vrátí součet čísel, která jsou kladná nebo menší než −10",
+          "type": "py.function",
+          "name": "soucetVybranych",
+          "cases": [
+            {
+              "args": [
+                [
+                  -12,
+                  -11,
+                  -10,
+                  -9,
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              ],
+              "expected": -17
+            },
+            {
+              "args": [
+                [
+                  -14,
+                  -12,
+                  -10,
+                  1,
+                  2,
+                  3
+                ]
+              ],
+              "expected": -20
+            },
+            {
+              "args": [
+                [
+                  1,
+                  1,
+                  1,
+                  -11,
+                  -11,
+                  -11
+                ]
+              ],
+              "expected": -30
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Součet založte před cyklem, v cyklu přičítejte jen čísla splňující podmínku s `or` a součet vraťte přes `return`, nevypisujte ho (kapitola return a print nejsou totéž)."
+        },
+        {
+          "id": "faktorial",
+          "description": "`faktorial(n)` vrátí faktoriál čísla `n`, faktoriál 0 je 1",
+          "type": "py.function",
+          "name": "faktorial",
+          "cases": [
+            {
+              "args": [
+                5
+              ],
+              "expected": 120
+            },
+            {
+              "args": [
+                1
+              ],
+              "expected": 1
+            },
+            {
+              "args": [
+                0
+              ],
+              "expected": 1
+            },
+            {
+              "args": [
+                6
+              ],
+              "expected": 720
+            }
+          ],
+          "hint": "Řešit lze cyklem i rekurzí; rekurze potřebuje ukončovací podmínku, která pokryje i 0 (kapitola Rekurze)."
+        },
+        {
+          "id": "hodnota-slova",
+          "description": "`hodnotaSlova(slovo)` vrátí bodovou hodnotu slova podle pravidel ze zadání",
+          "type": "py.function",
+          "name": "hodnotaSlova",
+          "cases": [
+            {
+              "args": [
+                "python"
+              ],
+              "expected": 10
+            },
+            {
+              "args": [
+                "Xena"
+              ],
+              "expected": 17
+            },
+            {
+              "args": [
+                "auto 1!"
+              ],
+              "expected": 10
+            },
+            {
+              "args": [
+                "žluťoučký"
+              ],
+              "expected": 17
+            },
+            {
+              "args": [
+                ""
+              ],
+              "expected": 0
+            }
+          ],
+          "points": 2,
+          "hint": "Převeďte slovo na malá písmena `lower()`, projděte ho cyklem po znacích a body přičítejte podmínkami `if`/`elif`; písmeno poznáte metodou `isalpha()`."
+        },
+        {
+          "id": "anotace",
+          "description": "Všechny funkce mají typové anotace parametrů i návratové hodnoty",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ`, u funkcí bez `return` `-> None` (kapitola Typové anotace)."
+        },
+        {
+          "id": "docstring",
+          "description": "Funkce `faktorial` má docstring",
+          "type": "py.signature",
+          "name": "faktorial",
+          "annotations": false,
+          "docstring": true,
+          "hint": "Hned pod hlavičku funkce napište text v trojitých uvozovkách `\"\"\"Krátký popis.\"\"\"` (kapitola Dokumentační řetězec - docstring)."
+        }
+      ]
+    }
+  ]
+}
