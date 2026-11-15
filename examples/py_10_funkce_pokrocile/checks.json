@@ -1,0 +1,646 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 10: Funkce – pokročilé",
+  "tasks": [
+    {
+      "id": "zakazka",
+      "name": "Hodnocení zakázky",
+      "prefix": "A",
+      "file": "zakazka.py",
+      "checks": [
+        {
+          "id": "body",
+          "description": "`bodyZakazky(…)` vrátí součet bodů podle všech pěti kritérií",
+          "type": "py.function",
+          "name": "bodyZakazky",
+          "cases": [
+            {
+              "args": [
+                "automotive",
+                500,
+                "CZ",
+                true,
+                true
+              ],
+              "expected": 10
+            },
+            {
+              "args": [
+                "retail",
+                5,
+                "DE"
+              ],
+              "expected": 3
+            },
+            {
+              "args": [
+                "stavebnictví",
+                2000,
+                "PL",
+                false,
+                true
+              ],
+              "expected": 2
+            },
+            {
+              "args": [
+                "automotive",
+                10,
+                "SK"
+              ],
+              "expected": 8
+            },
+            {
+              "args": [
+                "retail",
+                1000,
+                "FR",
+                true
+              ],
+              "expected": 7
+            },
+            {
+              "args": [
+                "retail",
+                1000.5,
+                "FR"
+              ],
+              "expected": 4
+            }
+          ],
+          "points": 2,
+          "hint": "Body sčítejte postupně po kritériích podmínkami `if`/`elif`; poslední dva parametry mají výchozí hodnotu `False` (kapitola Výchozí hodnota parametru)."
+        },
+        {
+          "id": "sance",
+          "description": "`sanceZakazky(body)` vrátí `\"malá\"` pro 0–5 bodů, `\"střední\"` pro 6–8 a `\"vysoká\"` pro 9–10",
+          "type": "py.function",
+          "name": "sanceZakazky",
+          "cases": [
+            {
+              "args": [
+                0
+              ],
+              "expected": "malá"
+            },
+            {
+              "args": [
+                5
+              ],
+              "expected": "malá"
+            },
+            {
+              "args": [
+                6
+              ],
+              "expected": "střední"
+            },
+            {
+              "args": [
+                8
+              ],
+              "expected": "střední"
+            },
+            {
+              "args": [
+                9
+              ],
+              "expected": "vysoká"
+            },
+            {
+              "args": [
+                10
+              ],
+              "expected": "vysoká"
+            }
+          ],
+          "hint": "Pozor na hranice intervalů: 5 bodů je ještě malá šance, 6 už střední (kapitola return)."
+        },
+        {
+          "id": "hodnoceni",
+          "description": "`hodnoceniZakazky(…)` vrátí šanci na získání zakázky, i když se zavolá jen se třemi argumenty",
+          "type": "py.function",
+          "name": "hodnoceniZakazky",
+          "cases": [
+            {
+              "args": [
+                "automotive",
+                500,
+                "CZ",
+                true,
+                true
+              ],
+              "expected": "vysoká"
+            },
+            {
+              "args": [
+                "retail",
+                5,
+                "DE"
+              ],
+              "expected": "malá"
+            },
+            {
+              "args": [
+                "automotive",
+                10,
+                "SK"
+              ],
+              "expected": "střední"
+            },
+            {
+              "args": [
+                "retail",
+                500,
+                "CZ",
+                false,
+                true
+              ],
+              "expected": "střední"
+            },
+            {
+              "args": [
+                "automotive",
+                500,
+                "CZ",
+                true
+              ],
+              "expected": "vysoká"
+            }
+          ],
+          "hint": "Funkce nic nepočítá sama: zavolá `bodyZakazky(…)` a výsledek předá funkci `sanceZakazky(…)` (kapitola Stavba programu s funkcemi)."
+        },
+        {
+          "id": "anotace",
+          "description": "Všechny funkce v `zakazka.py` mají typové anotace",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace)."
+        },
+        {
+          "id": "docstring",
+          "description": "Všechny funkce v `zakazka.py` mají docstring",
+          "type": "py.signature",
+          "annotations": false,
+          "docstring": true,
+          "hint": "Hned pod hlavičku každé funkce napište `\"\"\"Krátký popis.\"\"\"` (kapitola Dokumentační řetězec - docstring)."
+        }
+      ]
+    },
+    {
+      "id": "sms",
+      "name": "SMS brána",
+      "prefix": "B",
+      "file": "sms.py",
+      "checks": [
+        {
+          "id": "cislo",
+          "description": "`jePlatneCislo(cislo)` pozná platné číslo: 9 číslic, nebo `+420` a 9 číslic",
+          "type": "py.function",
+          "name": "jePlatneCislo",
+          "cases": [
+            {
+              "args": [
+                "734123456"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "73412345"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "7341234567"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "+420734123456"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "+421734123456"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "420734123456"
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                "73412345a"
+              ],
+              "expected": false
+            }
+          ],
+          "hint": "Délku zjistíte `len()`, předvolbu `cislo.startswith(\"+420\")` nebo řezem `cislo[0:4]`, číslice metodou `isdigit()` (kapitola Funkce, které vracejí True nebo False)."
+        },
+        {
+          "id": "mezery",
+          "description": "`jePlatneCislo(cislo)` si poradí s mezerami v čísle",
+          "type": "py.function",
+          "name": "jePlatneCislo",
+          "cases": [
+            {
+              "args": [
+                "+420 734 123 456"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "734 123 456"
+              ],
+              "expected": true
+            },
+            {
+              "args": [
+                "734 12 345"
+              ],
+              "expected": false
+            }
+          ],
+          "hint": "Mezery odstraňte na začátku funkce: `cislo = cislo.replace(\" \", \"\")`."
+        },
+        {
+          "id": "cena",
+          "description": "`cenaZpravy(text)` vrátí cenu 3 Kč za každých započatých 180 znaků",
+          "type": "py.function",
+          "name": "cenaZpravy",
+          "cases": [
+            {
+              "args": [
+                ""
+              ],
+              "expected": 0
+            },
+            {
+              "args": [
+                "a"
+              ],
+              "expected": 3
+            },
+            {
+              "args": [
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              ],
+              "expected": 3
+            },
+            {
+              "args": [
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              ],
+              "expected": 6
+            },
+            {
+              "args": [
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              ],
+              "expected": 6
+            },
+            {
+              "args": [
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              ],
+              "expected": 9
+            }
+          ],
+          "hint": "Počet započatých částí je celočíselné dělení zaokrouhlené nahoru: `(delka + 179) // 180`."
+        },
+        {
+          "id": "anotace",
+          "description": "Všechny funkce v `sms.py` mají typové anotace",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace)."
+        }
+      ]
+    },
+    {
+      "id": "staty",
+      "name": "Státy světa",
+      "prefix": "C",
+      "file": "staty.py",
+      "checks": [
+        {
+          "id": "populace",
+          "description": "`populaceRegionu(staty, region)` vrátí součet obyvatel států v regionu, pro neznámý region 0",
+          "type": "py.function",
+          "name": "populaceRegionu",
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Europe"
+              ],
+              "expected": 15984776
+            },
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Asia"
+              ],
+              "expected": 126960000
+            },
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Mars"
+              ],
+              "expected": 0
+            }
+          ],
+          "hint": "Seznam států dostane funkce parametrem, globální proměnnou `staty` uvnitř nepoužívejte (kapitola Čisté funkce a vedlejší efekty)."
+        },
+        {
+          "id": "seznam",
+          "description": "`statyRegionu(staty, region)` vrátí seznam názvů států v regionu",
+          "type": "py.function",
+          "name": "statyRegionu",
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Europe"
+              ],
+              "expected": [
+                "Czech Republic",
+                "Slovakia"
+              ]
+            },
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Mars"
+              ],
+              "expected": []
+            }
+          ],
+          "hint": "Založte prázdný seznam, v cyklu do něj přidávejte `stat[\"name\"]` a seznam vraťte (kapitola Seznam jako argument)."
+        },
+        {
+          "id": "nejlidnatejsi",
+          "description": "`nejlidnatejsiStat(staty, region)` vrátí název nejlidnatějšího státu v regionu, nic-li nenajde, vrátí `\"\"`",
+          "type": "py.function",
+          "name": "nejlidnatejsiStat",
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Europe"
+              ],
+              "expected": "Czech Republic"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Asia"
+              ],
+              "expected": "Japan"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "name": "Czech Republic",
+                    "region": "Europe",
+                    "population": 10558524
+                  },
+                  {
+                    "name": "Slovakia",
+                    "region": "Europe",
+                    "population": 5426252
+                  },
+                  {
+                    "name": "Japan",
+                    "region": "Asia",
+                    "population": 126960000
+                  },
+                  {
+                    "name": "Bouvet Island",
+                    "region": "",
+                    "population": 0
+                  }
+                ],
+                "Mars"
+              ],
+              "expected": ""
+            }
+          ],
+          "hint": "Pamatujte si nejvyšší dosaženou populaci a název k ní; výchozí název je prázdný text `\"\"` (kapitola return)."
+        },
+        {
+          "id": "anotace",
+          "description": "Všechny funkce v `staty.py` mají typové anotace",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace). Seznam slovníků má typ `list[dict]`."
+        }
+      ]
+    },
+    {
+      "id": "kosik",
+      "name": "Košík",
+      "prefix": "D",
+      "file": "kosik.py",
+      "checks": [
+        {
+          "id": "vychozi",
+          "description": "`pridejDoKosiku(zbozi, kosik)` bez předaného košíku pokaždé začne prázdným košíkem",
+          "type": "py.function",
+          "name": "pridejDoKosiku",
+          "cases": [
+            {
+              "args": [
+                "tričko"
+              ],
+              "expected": [
+                "tričko"
+              ]
+            },
+            {
+              "args": [
+                "mikina"
+              ],
+              "expected": [
+                "mikina"
+              ]
+            },
+            {
+              "args": [
+                "čepice",
+                [
+                  "tričko"
+                ]
+              ],
+              "expected": [
+                "tričko",
+                "čepice"
+              ]
+            }
+          ],
+          "hint": "Seznam jako výchozí hodnota se vytvoří jen jednou; použijte `kosik: list[str] | None = None` a prázdný seznam vytvořte uvnitř funkce (kapitola Past - seznam jako výchozí hodnota)."
+        },
+        {
+          "id": "anotace",
+          "description": "Funkce v `kosik.py` mají typové anotace",
+          "type": "py.signature",
+          "hint": "Parametr se zapisuje `nazev: typ` a za závorku patří návratový typ `-> typ` (kapitola Typové anotace)."
+        }
+      ]
+    }
+  ]
+}

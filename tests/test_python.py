@@ -100,3 +100,44 @@ def test_relative_repo_root(repo, monkeypatch):
     rel = repo.root.relative_to(repo.root.parent)
     res = base.get("py.eval").fn(CheckContext.for_file(rel, "r.py"), {"expr": "x", "expected": 5})
     assert res.passed, res.reason
+
+
+def test_function_stdout(repo):
+    src = "def pozdrav(n):\n    for _ in range(n):\n        print('Ahoj')\n"
+    cases = [{"args": [2], "expected": None, "stdout": "Ahoj\nAhoj\n"}, {"args": [0], "expected": None, "stdout": ""}]
+    assert check(repo, "py.function", src, cases=cases, name="pozdrav").passed
+    res = check(repo, "py.function", "def pozdrav(n):\n    print('Ahoj')\n", cases=cases, name="pozdrav")
+    assert not res.passed and "vypsala 'Ahoj\\n'," in res.reason and "'Ahoj\\nAhoj\\n'" in res.reason
+
+
+def test_function_args_after(repo):
+    cases = [{"args": [["a"], "b"], "expected": None, "args_after": [["a", "b"], "b"]}]
+    src = "def pridej(s, x):\n    if x not in s:\n        s.append(x)\n"
+    assert check(repo, "py.function", src, cases=cases).passed
+    res = check(repo, "py.function", "def pridej(s, x):\n    s = s + [x]\n", cases=cases)
+    assert not res.passed and "argumenty po zavolání" in res.reason and "[['a'], 'b']" in res.reason
+
+
+def test_function_cases_share_default_value(repo):
+    # Případy běží za sebou nad stejnou funkcí, takže past s měnitelnou výchozí hodnotou se projeví.
+    cases = [{"args": ["a"], "expected": ["a"]}, {"args": ["b"], "expected": ["b"]}]
+    assert not check(repo, "py.function", "def f(x, s=[]):\n    s.append(x)\n    return s\n", cases=cases).passed
+    ok = "def f(x, s=None):\n    if s is None:\n        s = []\n    s.append(x)\n    return s\n"
+    assert check(repo, "py.function", ok, cases=cases).passed
+
+
+def test_signature_annotations(repo):
+    ok = "def f(a: int, b: str = 'x') -> int:\n    return a\n\ndef g() -> None:\n    pass\n"
+    assert check(repo, "py.signature", ok).passed
+    res = check(repo, "py.signature", ok + "\ndef h(a, b: int):\n    return a\n")
+    assert not res.passed and "`h` (řádek 7)" in res.reason and "`a`" in res.reason and "-> …" in res.reason
+    assert "žádná funkce" in check(repo, "py.signature", "x = 1\n").reason
+
+
+def test_signature_named_docstring(repo):
+    src = 'def f(n):\n    """Vrátí n."""\n    return n\n\ndef g(n):\n    return n\n'
+    assert check(repo, "py.signature", src, name="f", annotations=False, docstring=True).passed
+    res = check(repo, "py.signature", src, name="g", annotations=False, docstring=True)
+    assert not res.passed and "docstring" in res.reason
+    assert "není funkce `zz`" in check(repo, "py.signature", src, name="zz").reason
+    assert not check(repo, "py.signature", "def f(:\n").passed
