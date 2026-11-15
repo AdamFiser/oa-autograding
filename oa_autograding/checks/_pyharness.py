@@ -92,23 +92,27 @@ def _try_function(name: str, fn: Any, cases: list[dict[str, Any]]) -> dict[str, 
         forms = _call_forms(fn, args)
         if not forms:
             return {"name": name, "passed": passed, "case": i, "error": "nejde zavolat s tímto počtem argumentů"}
-        got: Any = None
+        mismatch: dict[str, str] = {}
         for form_args, form_kw in forms:
+            call_args, call_kw = copy.deepcopy(form_args), copy.deepcopy(form_kw)
+            out = io.StringIO()
             try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    got = fn(*copy.deepcopy(form_args), **copy.deepcopy(form_kw))
+                with contextlib.redirect_stdout(out):
+                    got = fn(*call_args, **call_kw)
             except Exception as e:  # noqa: BLE001
-                got = e
+                mismatch = {"error": f"{type(e).__name__}: {e}"}
                 continue
-            if same(got, case["expected"]):
+            # Volitelně i výpis funkce (`stdout`) a stav argumentů po zavolání (`args_after`).
+            if not same(got, case["expected"]):
+                mismatch = {"got": show(got)}
+            elif "stdout" in case and out.getvalue() != case["stdout"]:
+                mismatch = {"stdout": repr(out.getvalue())[:_REPR]}
+            elif "args_after" in case and not same(list(call_args), case["args_after"]):
+                mismatch = {"args_after": repr(list(call_args))[:_REPR]}
+            else:
                 break
         else:
-            res = {"name": name, "passed": passed, "case": i, "args": show(args)[:_REPR]}
-            if isinstance(got, Exception):
-                res["error"] = f"{type(got).__name__}: {got}"
-            else:
-                res["got"] = show(got)
-            return res
+            return {"name": name, "passed": passed, "case": i, "args": show(args)[:_REPR], **mismatch}
         passed += 1
     return {"name": name, "passed": passed, "ok": True}
 

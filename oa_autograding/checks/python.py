@@ -6,7 +6,12 @@
 - `py.function`: `cases` (povinné, `[{"args": [...], "expected": …}]`), `name`
   (volitelné; bez něj se zkusí každá funkce ze souboru), `timeout` (`10` s) — projde,
   když jedna funkce vrátí pro všechny vstupy očekávanou hodnotu. Jediný slovníkový
-  argument se zkusí předat i jako pojmenované parametry (`f(**zakazka)`).
+  argument se zkusí předat i jako pojmenované parametry (`f(**zakazka)`). Případ může
+  navíc chtít přesný výpis funkce (`stdout`) a stav pozičních argumentů po zavolání
+  (`args_after`).
+- `py.signature`: `name` (volitelné; bez něj všechny funkce, aspoň jedna), `annotations`
+  (`true`), `docstring` (`false`) — statická analýza, že funkce mají typové anotace
+  parametrů i návratové hodnoty, případně docstring.
 - `py.uses`: `any_of` (povinné, seznam konstrukcí z `CONSTRUCTS`) — statická analýza
   (AST), kód se nespouští; projde, když je v kódu alespoň jedna z konstrukcí.
 
@@ -89,11 +94,47 @@ def py_function(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
     case = cases[best["case"]]
     if "args" not in best:
         why = f"funkce `{best['name']}` {best['error']}"
+    elif "stdout" in best:
+        why = f"`{best['name']}` pro vstup {best['args']} vypsala {best['stdout']}, očekáváno {case['stdout']!r}"
+    elif "args_after" in best:
+        why = (f"`{best['name']}` pro vstup {best['args']}: argumenty po zavolání jsou {best['args_after']}, "
+               f"očekáváno {case['args_after']!r}")
     else:
         got = f"skončila chybou {best['error']}" if "error" in best else f"vrátila {best['got']}"
         exp = f"{case['expected']!r} ({type(case['expected']).__name__})"
         why = f"`{best['name']}` pro vstup {best['args']} {got}, očekáváno {exp}"
     return CheckResult(False, f"Žádná funkce nevrátila pro všechny vstupy správný výsledek. Nejblíž: {why}.{_crash_note(res)}")
+
+
+@register("py.signature")
+def py_signature(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
+    try:
+        tree = ast.parse(ctx.raw)
+    except SyntaxError as e:
+        return CheckResult(False, f"Soubor obsahuje syntaktickou chybu (řádek {e.lineno}: {e.msg}), Python ho nespustí.")
+    name = p.get("name")
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+             and (name is None or n.name == name)]
+    if not funcs:
+        return CheckResult(False, f"V souboru není funkce `{name}`." if name else "V souboru není žádná funkce (`def`).")
+    problems = []
+    for f in sorted(funcs, key=lambda f: f.lineno):
+        missing = []
+        if p.get("annotations", True):
+            a = f.args
+            params = [*a.posonlyargs, *a.args, *a.kwonlyargs, *(x for x in (a.vararg, a.kwarg) if x)]
+            bare = [x.arg for x in params if x.annotation is None and x.arg not in ("self", "cls")]
+            if bare:
+                missing.append("typ u parametru " + ", ".join(f"`{b}`" for b in bare))
+            if f.returns is None:
+                missing.append("návratový typ `-> …`")
+        if p.get("docstring", False) and not ast.get_docstring(f):
+            missing.append("docstring")
+        if missing:
+            problems.append(f"`{f.name}` (řádek {f.lineno}): chybí " + " a ".join(missing))
+    if not problems:
+        return CheckResult(True, details=", ".join(f.name for f in funcs))
+    return CheckResult(False, "; ".join(problems[:5]) + ("; …" if len(problems) > 5 else "") + ".")
 
 
 def _is_const(node: ast.AST, *types: type) -> bool:
