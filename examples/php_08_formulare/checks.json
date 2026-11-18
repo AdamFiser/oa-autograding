@@ -1,0 +1,1424 @@
+{
+  "schema": "oa-autograding/checks/v1",
+  "title": "Cvičení 08: PHP - Formuláře",
+  "tasks": [
+    {
+      "id": "priprava",
+      "name": "Příprava a knihovna (Než začnete, úkol 1)",
+      "prefix": "A",
+      "file": "index.php",
+      "checks": [
+        {
+          "id": "meta-author",
+          "description": "Meta author vypisuje vaše jméno z konfigurace",
+          "type": "php.page",
+          "expected": "<meta name=\"author\" content=\"(?!yourName\")[^\"<]*\\S[^\"<]*\">",
+          "comparison": "regex",
+          "hint": "V `includes/config.php` přepište `yourName` na své jméno (Než začnete)."
+        },
+        {
+          "id": "version",
+          "description": "Patička ukazuje verzi `1.5`",
+          "type": "php.page",
+          "expected": "Maturita v1.5",
+          "hint": "V `includes/config.php` nastavte `'version' => '1.5'` (Než začnete)."
+        },
+        {
+          "id": "nacti-text",
+          "description": "`nactiText(array $data, string $klic): string` vrací text bez okrajových mezer, jinak `''`",
+          "type": "php.function",
+          "file": "includes/formular.php",
+          "name": "nactiText",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                {
+                  "jmeno": "  Jan "
+                },
+                "jmeno"
+              ],
+              "expected": "Jan"
+            },
+            {
+              "args": [
+                {},
+                "jmeno"
+              ],
+              "expected": "",
+              "label": "[], 'jmeno'"
+            },
+            {
+              "args": [
+                {
+                  "jmeno": [
+                    "x"
+                  ]
+                },
+                "jmeno"
+              ],
+              "expected": "",
+              "label": "['jmeno' => ['x']], 'jmeno'"
+            }
+          ],
+          "hint": "Hodnotu vezměte přes `?? ''`, a není-li to řetězec (`is_string`), vraťte `''`; jinak `trim()` (kapitola Knihovna formular.php)."
+        },
+        {
+          "id": "escapuj",
+          "description": "`escapuj(string $text): string` převede `< > & \" '` na entity",
+          "type": "php.function",
+          "file": "includes/formular.php",
+          "name": "escapuj",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                "<b>\"x\" & 'y'</b>"
+              ],
+              "expected": "&lt;b&gt;&quot;x&quot; &amp; &#039;y&#039;&lt;/b&gt;"
+            }
+          ],
+          "hint": "Funkce jen vrátí `htmlspecialchars($text)` (kapitola Ošetření výstupu)."
+        },
+        {
+          "id": "require-index",
+          "description": "`index.php` načítá `includes/formular.php`",
+          "type": "php.page",
+          "source_contains": [
+            "includes/formular.php"
+          ],
+          "hint": "Pod načtení `functions.php` přidejte `require_once __DIR__ . '/includes/formular.php';` (úkol 1)."
+        },
+        {
+          "id": "require-aboutme",
+          "description": "`aboutme.php` načítá `includes/formular.php`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "source_contains": [
+            "includes/formular.php"
+          ],
+          "hint": "Pod načtení `functions.php` přidejte `require_once __DIR__ . '/includes/formular.php';` (úkol 1)."
+        },
+        {
+          "id": "require-contact",
+          "description": "`contact.php` načítá `includes/formular.php`",
+          "type": "php.page",
+          "file": "contact.php",
+          "source_contains": [
+            "includes/formular.php"
+          ],
+          "hint": "Pod načtení konfigurace přidejte `require_once __DIR__ . '/includes/formular.php';` (úkol 1)."
+        }
+      ]
+    },
+    {
+      "id": "adresa",
+      "name": "Bezpečné hodnoty z adresy (úkol 2)",
+      "prefix": "B",
+      "file": "includes/formular.php",
+      "checks": [
+        {
+          "id": "nacti-volbu",
+          "description": "`nactiVolbu(array $data, string $klic, array $povolene): ?string` vrací jen povolenou hodnotu",
+          "type": "php.function",
+          "name": "nactiVolbu",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                {
+                  "rok": "2024"
+                },
+                "rok",
+                [
+                  "2023",
+                  "2024"
+                ]
+              ],
+              "expected": "2024"
+            },
+            {
+              "args": [
+                {
+                  "rok": "2026"
+                },
+                "rok",
+                [
+                  "2023",
+                  "2024"
+                ]
+              ],
+              "expected": null
+            },
+            {
+              "args": [
+                {
+                  "rok": [
+                    "2024"
+                  ]
+                },
+                "rok",
+                [
+                  "2023",
+                  "2024"
+                ]
+              ],
+              "expected": null,
+              "label": "['rok' => ['2024']], 'rok', ['2023', '2024']"
+            },
+            {
+              "args": [
+                {},
+                "rok",
+                [
+                  "2023",
+                  "2024"
+                ]
+              ],
+              "expected": null,
+              "label": "[], 'rok', ['2023', '2024']"
+            }
+          ],
+          "hint": "Hodnotu vezměte přes `?? null` a vraťte ji, jen když `in_array($hodnota, $povolene, true)`; jinak `null` (kapitola Funkce pro checkbox a výběr)."
+        },
+        {
+          "id": "nacti-cislo",
+          "description": "`nactiCislo(array $data, string $klic, int $min, int $max): ?int` vrací celé číslo v rozsahu, jinak `null`",
+          "type": "php.function",
+          "name": "nactiCislo",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                {
+                  "days": "17"
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": 17
+            },
+            {
+              "args": [
+                {
+                  "days": "-3"
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": -3
+            },
+            {
+              "args": [
+                {
+                  "days": "abc"
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": null
+            },
+            {
+              "args": [
+                {
+                  "days": "400"
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": null
+            },
+            {
+              "args": [
+                {
+                  "days": ""
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": null
+            },
+            {
+              "args": [
+                {
+                  "days": [
+                    "3"
+                  ]
+                },
+                "days",
+                -365,
+                365
+              ],
+              "expected": null,
+              "label": "['days' => ['3']], 'days', -365, 365"
+            },
+            {
+              "args": [
+                {},
+                "days",
+                -365,
+                365
+              ],
+              "expected": null,
+              "label": "[], 'days', -365, 365"
+            }
+          ],
+          "hint": "`filter_var(…, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]])` vrátí `false`, když hodnota neprojde — z `false` udělejte `null` (kapitola E-mail a čísla)."
+        },
+        {
+          "id": "days",
+          "description": "`index.php?days=abc` ukazuje `Do odevzdání zbývá 12 dní.`",
+          "type": "php.page",
+          "file": "index.php",
+          "query": {
+            "days": "abc"
+          },
+          "expected": "Do odevzdání zbývá 12 dní.",
+          "hint": "`$daysLeft = nactiCislo($_GET, 'days', -365, 365) ?? 12;` — neplatné číslo nahradí výchozí hodnota (úkol 2)."
+        },
+        {
+          "id": "status",
+          "description": "`aboutme.php?status=hacked` ukazuje stav `čeká na schválení`",
+          "type": "php.page",
+          "file": "aboutme.php",
+          "query": {
+            "status": "hacked"
+          },
+          "expected": "čeká na schválení",
+          "hint": "`$status = nactiVolbu($_GET, 'status', ['approved', 'pending', 'rejected']) ?? 'pending';` (úkol 2)."
+        }
+      ]
+    },
+    {
+      "id": "hledani",
+      "name": "Vyhledávání v historických tématech (úkol 3)",
+      "prefix": "C",
+      "file": "includes/functions.php",
+      "checks": [
+        {
+          "id": "filter",
+          "description": "`filterTopics(array $topics, string $search, int $year = 0): array` hledá v názvu bez ohledu na velikost písmen a podle roku",
+          "type": "php.function",
+          "name": "filterTopics",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "ŠKOL"
+              ],
+              "expected": [
+                {
+                  "title": "Rezervační systém pro autoškolu",
+                  "author": "Jan Dvořák",
+                  "year": 2023,
+                  "grade": 1
+                },
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                }
+              ],
+              "label": "témata (4), 'ŠKOL'"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "",
+                2024
+              ],
+              "expected": [
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                }
+              ],
+              "label": "témata (4), '', 2024"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "škol",
+                2024
+              ],
+              "expected": [
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                }
+              ],
+              "label": "témata (4), 'škol', 2024"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                ""
+              ],
+              "expected": [
+                {
+                  "title": "Rezervační systém pro autoškolu",
+                  "author": "Jan Dvořák",
+                  "year": 2023,
+                  "grade": 1
+                },
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                },
+                {
+                  "title": "Správa sportovního klubu",
+                  "author": "Martin Kolář",
+                  "year": 2025,
+                  "grade": 4
+                }
+              ],
+              "label": "témata (4), ''"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "hra"
+              ],
+              "expected": [],
+              "label": "témata (4), 'hra'"
+            }
+          ],
+          "hint": "Projděte témata `foreach` a vyhovující přidejte do nového pole (`$found[] = $topic;`); název porovnejte `mb_stripos($topic['title'], $search) !== false` (úkol 3)."
+        },
+        {
+          "id": "page-search",
+          "description": "`index.php?hledat=škol` ukazuje `Nalezeno: 5`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "index.php",
+              "query": {
+                "hledat": "škol"
+              },
+              "expect": {
+                "regex": "Nalezeno:\\s*5\\b"
+              }
+            }
+          ],
+          "hint": "Hledaný text načtěte `nactiText($_GET, 'hledat')`, vyfiltrujte `filterTopics()` a nad tabulku vypište `Nalezeno: ` + `count()` (úkol 3)."
+        },
+        {
+          "id": "page-filter",
+          "description": "`index.php?hledat=ŠKOL&rok=2024` ukazuje `Nalezeno: 2` a v tabulce jen nalezená témata",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "index.php",
+              "query": {
+                "hledat": "ŠKOL",
+                "rok": "2024"
+              },
+              "expect": {
+                "regex": "Nalezeno:\\s*2\\b",
+                "contains": [
+                  "Plánovač školních rozvrhů"
+                ],
+                "not_contains": [
+                  "Rezervační systém pro autoškolu"
+                ]
+              }
+            }
+          ],
+          "hint": "Rok načtěte `nactiVolbu($_GET, 'rok', ['2023', '2024', '2025'])`, převeďte `(int)` a cyklus tabulky veďte přes nalezená témata (úkol 3)."
+        },
+        {
+          "id": "page-remember",
+          "description": "Formulář si pamatuje zadání: `value=\"škol\"` a rok 2024 `selected`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "index.php",
+              "query": {
+                "hledat": "škol",
+                "rok": "2024"
+              },
+              "expect": {
+                "contains": [
+                  "value=\"škol\""
+                ],
+                "regex": "<option(?=[^>]*value=\"2024\")(?=[^>]*\\bselected\\b)[^>]*>"
+              }
+            }
+          ],
+          "hint": "Do `value` pole `hledat` vypište `escapuj($search)` a vybranému roku přidejte atribut `selected` (úkol 3, bod 4)."
+        },
+        {
+          "id": "page-xss",
+          "description": "`index.php?hledat=<b>ahoj</b>` vypíše hledaný text escapovaný ve výsledcích i ve `value`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "index.php",
+              "query": {
+                "hledat": "<b>ahoj</b>"
+              },
+              "expect": {
+                "contains": [
+                  "value=\"&lt;b&gt;ahoj&lt;/b&gt;\""
+                ],
+                "regex": "Výsledky pro[^<]*&lt;b&gt;ahoj&lt;/b&gt;",
+                "not_contains": [
+                  "<b>ahoj</b>"
+                ]
+              }
+            }
+          ],
+          "hint": "Hledaný text píše uživatel — do stránky jen přes `escapuj()`, v textu `Výsledky pro „…“` i v atributu `value` (kapitola Ošetření výstupu)."
+        }
+      ]
+    },
+    {
+      "id": "kontakt",
+      "name": "Kontaktní formulář (úkol 4)",
+      "prefix": "D",
+      "file": "includes/formular.php",
+      "checks": [
+        {
+          "id": "over-text",
+          "description": "`overText(string $text, string $nazev, int $maxDelka): ?string` vrací text chyby, nebo `null`",
+          "type": "php.function",
+          "name": "overText",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                "",
+                "jméno",
+                50
+              ],
+              "expected": "Vyplňte pole jméno."
+            },
+            {
+              "args": [
+                "Šťěpánek",
+                "jméno",
+                6
+              ],
+              "expected": "Pole jméno může mít nejvýš 6 znaků."
+            },
+            {
+              "args": [
+                "Šťěpán",
+                "jméno",
+                6
+              ],
+              "expected": null
+            },
+            {
+              "args": [
+                "Ahoj",
+                "zpráva",
+                1000
+              ],
+              "expected": null
+            }
+          ],
+          "hint": "Délku počítejte `mb_strlen()` (počítá znaky, ne bajty); texty chyb přesně podle zadání (kapitola Validace na serveru)."
+        },
+        {
+          "id": "over-email",
+          "description": "`overEmail(string $email): ?string` vrací text chyby, nebo `null`",
+          "type": "php.function",
+          "name": "overEmail",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                ""
+              ],
+              "expected": "Vyplňte e-mail."
+            },
+            {
+              "args": [
+                "jan@"
+              ],
+              "expected": "E-mail nemá správný formát."
+            },
+            {
+              "args": [
+                "jan@example.com"
+              ],
+              "expected": null
+            }
+          ],
+          "hint": "`filter_var($email, FILTER_VALIDATE_EMAIL) === false` znamená špatný formát (kapitola E-mail a čísla)."
+        },
+        {
+          "id": "page-empty",
+          "description": "Prázdný formulář ukáže čtyři chyby",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php"
+            },
+            {
+              "method": "POST",
+              "path": "contact.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "contains": [
+                  "Vyplňte pole jméno.",
+                  "Vyplňte e-mail.",
+                  "Vyberte typ dotazu.",
+                  "Vyplňte pole zpráva."
+                ]
+              },
+              "form": {},
+              "label": "Odeslání prázdného formuláře"
+            }
+          ],
+          "hint": "Zpracování jen při `$_SERVER['REQUEST_METHOD'] === 'POST'`, chyby posbírejte `array_filter([...])` a vypište pod pole přes `escapuj($chyby['jmeno'] ?? '')` (úkol 4)."
+        },
+        {
+          "id": "page-keep",
+          "description": "Chybný formulář vrátí vyplněné hodnoty escapované, vybraný typ a text zprávy",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php"
+            },
+            {
+              "method": "POST",
+              "path": "contact.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "contains": [
+                  "value=\"&lt;script&gt;alert(1)&lt;/script&gt;\"",
+                  "E-mail nemá správný formát."
+                ],
+                "regex": [
+                  "<option(?=[^>]*value=\"konzultace\")(?=[^>]*\\bselected\\b)[^>]*>",
+                  ">\\s*Ahoj\\s*</textarea>"
+                ],
+                "not_contains": [
+                  "<script>alert(1)</script>"
+                ]
+              },
+              "form": {
+                "jmeno": "<script>alert(1)</script>",
+                "email": "jan@",
+                "typ": "konzultace",
+                "zprava": "Ahoj"
+              },
+              "label": "Odeslání formuláře se špatným e-mailem"
+            }
+          ],
+          "hint": "Do `value` vypište `escapuj($jmeno)`, vybranému typu `selected` a text zprávy mezi `<textarea>` a `</textarea>` (úkol 4, bod 3)."
+        },
+        {
+          "id": "page-forged",
+          "description": "Podvržené `typ=hack` a `jmeno[]=x` skončí chybou, ne varováním PHP",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php"
+            },
+            {
+              "method": "POST",
+              "path": "contact.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "contains": [
+                  "Vyplňte pole jméno.",
+                  "Vyberte typ dotazu."
+                ],
+                "no_warnings": true
+              },
+              "form": {
+                "jmeno[]": "x",
+                "email": "jan@example.com",
+                "typ": "hack",
+                "zprava": "Ahoj"
+              },
+              "label": "Odeslání podvrženého formuláře"
+            }
+          ],
+          "hint": "Hodnoty čtěte jen přes `nactiText()` a `nactiVolbu($_POST, 'typ', array_keys($typy))` — útočník nemusí poslat to, co je ve formuláři (kapitola Útočník neposílá to, co je ve formuláři)."
+        }
+      ]
+    },
+    {
+      "id": "prg",
+      "name": "Přesměrování po odeslání (úkol 5)",
+      "prefix": "E",
+      "file": "contact.php",
+      "checks": [
+        {
+          "id": "redirect",
+          "description": "Platný formulář přesměruje kódem 303 na `contact.php?odeslano=1`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php"
+            },
+            {
+              "method": "POST",
+              "path": "contact.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "status": 303,
+                "location": "contact.php?odeslano=1"
+              },
+              "form": {
+                "jmeno": "Jan",
+                "email": "jan@example.com",
+                "typ": "tema",
+                "zprava": "Dobrý den"
+              },
+              "label": "Odeslání platného formuláře"
+            }
+          ],
+          "hint": "`presmeruj(string $adresa): never` pošle `header('Location: ' . $adresa, true, 303);` a skončí `exit;` — volejte ji, když `$chyby === []` (kapitola Po úspěšném odeslání)."
+        },
+        {
+          "id": "thanks",
+          "description": "`contact.php?odeslano=1` ukazuje `Děkujeme, dotaz jsme přijali.`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php",
+              "query": {
+                "odeslano": "1"
+              },
+              "expect": {
+                "contains": [
+                  "Děkujeme, dotaz jsme přijali."
+                ]
+              }
+            }
+          ],
+          "hint": "`if (isset($_GET['odeslano']))` vypište nad formulář zelenou zprávu (úkol 5, bod 3)."
+        }
+      ]
+    },
+    {
+      "id": "csrf",
+      "name": "Ochrana proti CSRF (úkol 6)",
+      "prefix": "F",
+      "file": "includes/formular.php",
+      "checks": [
+        {
+          "id": "over-token",
+          "description": "`overCsrfToken(array $data): bool` odmítne chybějící, cizí i podvržený token",
+          "type": "php.function",
+          "name": "overCsrfToken",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                {}
+              ],
+              "expected": false,
+              "label": "[]"
+            },
+            {
+              "args": [
+                {
+                  "csrfToken": "cizi-token"
+                }
+              ],
+              "expected": false
+            },
+            {
+              "args": [
+                {
+                  "csrfToken": [
+                    "x"
+                  ]
+                }
+              ],
+              "expected": false,
+              "label": "['csrfToken' => ['x']]"
+            }
+          ],
+          "hint": "`$token = $data['csrfToken'] ?? '';` a vraťte `is_string($token) && hash_equals(csrfToken(), $token)` (kapitola Ochrana proti CSRF)."
+        },
+        {
+          "id": "hidden",
+          "description": "Formulář na stránce Kontakt má skryté pole `csrfToken` s 64 znaky",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "contact.php",
+              "expect": {
+                "regex": "<input(?=[^>]*type=\"hidden\")(?=[^>]*name=\"csrfToken\")(?=[^>]*value=\"[0-9a-f]{64}\")[^>]*>"
+              }
+            }
+          ],
+          "hint": "Na začátek stránky `session_start();` a do formuláře `<input type=\"hidden\" name=\"csrfToken\" value=\"<?php echo csrfToken(); ?>\">` (úkol 6)."
+        },
+        {
+          "id": "reject",
+          "description": "Odeslání bez tokenu skončí kódem 403 a textem `Neplatný token.`",
+          "type": "php.http",
+          "steps": [
+            {
+              "method": "POST",
+              "path": "contact.php",
+              "form": {
+                "jmeno": "Jan",
+                "email": "jan@example.com",
+                "typ": "tema",
+                "zprava": "Dobrý den"
+              },
+              "label": "Odeslání formuláře bez tokenu",
+              "expect": {
+                "status": 403,
+                "contains": [
+                  "Neplatný token."
+                ]
+              }
+            }
+          ],
+          "hint": "Při POST nejdřív `if (!overCsrfToken($_POST)) { http_response_code(403); exit('Neplatný token. …'); }` (úkol 6, bod 4)."
+        }
+      ]
+    },
+    {
+      "id": "foto",
+      "name": "Fotka do profilu (úkol 7)",
+      "prefix": "G",
+      "file": "includes/formular.php",
+      "checks": [
+        {
+          "id": "over-obrazek",
+          "description": "`overObrazek(?array $soubor, int $maxVelikost): ?string` vrací text chyby",
+          "type": "php.function",
+          "name": "overObrazek",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                null,
+                100
+              ],
+              "expected": "Vyberte jeden soubor."
+            },
+            {
+              "args": [
+                {
+                  "error": [
+                    0
+                  ]
+                },
+                100
+              ],
+              "expected": "Vyberte jeden soubor.",
+              "label": "['error' => [0]], 100"
+            },
+            {
+              "args": [
+                {
+                  "error": 4,
+                  "size": 0,
+                  "tmp_name": ""
+                },
+                100
+              ],
+              "expected": "Vyberte soubor.",
+              "label": "UPLOAD_ERR_NO_FILE"
+            },
+            {
+              "args": [
+                {
+                  "error": 1,
+                  "size": 0,
+                  "tmp_name": ""
+                },
+                100
+              ],
+              "expected": "Soubor se nepodařilo nahrát.",
+              "label": "UPLOAD_ERR_INI_SIZE"
+            },
+            {
+              "args": [
+                {
+                  "error": 0,
+                  "size": 500,
+                  "tmp_name": "../odpovedi.md"
+                },
+                100
+              ],
+              "expected": "Soubor je příliš velký.",
+              "label": "soubor 500 B, limit 100"
+            },
+            {
+              "args": [
+                {
+                  "error": 0,
+                  "size": 50,
+                  "tmp_name": "../odpovedi.md"
+                },
+                100
+              ],
+              "expected": "Povolené jsou jen obrázky JPG, PNG a WebP.",
+              "label": "textový soubor"
+            }
+          ],
+          "hint": "Pořadí kontrol: chybí / pole souborů (`!is_int($soubor['error'] ?? null)`), `UPLOAD_ERR_NO_FILE`, jiná chyba, `size`, typ přes `priponaObrazku()` (kapitola Kontrola obrázku)."
+        },
+        {
+          "id": "upload",
+          "description": "Nahraný PNG se uloží do `uploads/` pod náhodným názvem a ukáže v profilu",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "aboutme.php"
+            },
+            {
+              "method": "POST",
+              "path": "aboutme.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "status": 303,
+                "location": "aboutme.php"
+              },
+              "files": {
+                "foto": {
+                  "fixture": "png"
+                }
+              },
+              "label": "Nahrání obrázku PNG"
+            },
+            {
+              "path": "aboutme.php",
+              "label": "Profil po nahrání",
+              "expect": {
+                "regex": "<img[^>]*src=\"uploads/[0-9a-f]{32}\\.png\""
+              }
+            }
+          ],
+          "files": [
+            {
+              "glob": "uploads/*.png",
+              "min": 1
+            }
+          ],
+          "hint": "Po `overObrazek()` bez chyby uložte `ulozObrazek($foto, __DIR__ . '/uploads')`, název dejte do `$_SESSION['foto']`, přesměrujte na `aboutme.php` a fotku vypište `<img src=\"uploads/…\">` (úkol 7)."
+        },
+        {
+          "id": "upload-php",
+          "description": "`virus.php` vydávaný za `foto.jpg` se odmítne a nic se neuloží",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "aboutme.php"
+            },
+            {
+              "method": "POST",
+              "path": "aboutme.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "contains": [
+                  "Povolené jsou jen obrázky JPG, PNG a WebP."
+                ]
+              },
+              "files": {
+                "foto": {
+                  "fixture": "php",
+                  "filename": "foto.jpg",
+                  "content_type": "image/jpeg"
+                }
+              },
+              "label": "Nahrání PHP skriptu jako foto.jpg"
+            }
+          ],
+          "files": [
+            {
+              "glob": "uploads/*.php",
+              "max": 0
+            },
+            {
+              "glob": "uploads/*.jpg",
+              "max": 0
+            }
+          ],
+          "hint": "Typ zjistěte z obsahu souboru (`mime_content_type($soubor['tmp_name'])`), ne z `name` ani `type` — ty posílá uživatel (kapitola Pole $_FILES)."
+        },
+        {
+          "id": "upload-big",
+          "description": "Obrázek 3 MB se odmítne hláškou `Soubor je příliš velký.`",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "aboutme.php"
+            },
+            {
+              "method": "POST",
+              "path": "aboutme.php",
+              "csrf": "csrfToken",
+              "expect": {
+                "contains": [
+                  "Soubor je příliš velký."
+                ]
+              },
+              "files": {
+                "foto": {
+                  "fixture": "png-3mb"
+                }
+              },
+              "label": "Nahrání obrázku 3 MB"
+            }
+          ],
+          "files": [
+            {
+              "glob": "uploads/*.png",
+              "max": 0
+            }
+          ],
+          "hint": "`overObrazek($foto, 2 * 1024 * 1024)` — limit 2 MB, chybu vypište pod formulář (úkol 7, bod 2)."
+        },
+        {
+          "id": "htaccess",
+          "description": "`uploads/.htaccess` zakazuje spouštění PHP",
+          "type": "file.contains",
+          "file": "uploads/.htaccess",
+          "text": "Require all denied",
+          "hint": "Vytvořte `uploads/.htaccess` s blokem `<FilesMatch \"\\.(php|phtml|phar)$\">` … `Require all denied` (úkol 7, bod 4)."
+        }
+      ]
+    },
+    {
+      "id": "bonus",
+      "name": "Bonus: filtr podle známek (úkol 8)",
+      "prefix": "H",
+      "file": "includes/formular.php",
+      "checks": [
+        {
+          "id": "nacti-volby",
+          "description": "`nactiVolby(array $data, string $klic, array $povolene): array` vrací jen povolené hodnoty",
+          "type": "php.function",
+          "name": "nactiVolby",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                {
+                  "znamka": [
+                    "1",
+                    "9",
+                    [
+                      "x"
+                    ],
+                    "2"
+                  ]
+                },
+                "znamka",
+                [
+                  "1",
+                  "2",
+                  "3"
+                ]
+              ],
+              "expected": [
+                "1",
+                "2"
+              ],
+              "label": "['znamka' => ['1', '9', ['x'], '2']], 'znamka', ['1', '2', '3']"
+            },
+            {
+              "args": [
+                {
+                  "znamka": "1"
+                },
+                "znamka",
+                [
+                  "1",
+                  "2"
+                ]
+              ],
+              "expected": []
+            },
+            {
+              "args": [
+                {},
+                "znamka",
+                [
+                  "1",
+                  "2"
+                ]
+              ],
+              "expected": [],
+              "label": "[], 'znamka', ['1', '2']"
+            }
+          ],
+          "hint": "Není-li hodnota pole (`is_array`), vraťte `[]`; jinak projděte hodnoty `foreach` a povolené (`in_array(…, true)`) přidejte do výsledku (kapitola Více hodnot)."
+        },
+        {
+          "id": "filter-grades",
+          "description": "`filterTopics()` se čtvrtým parametrem `array $grades = []` filtruje i podle známek",
+          "type": "php.function",
+          "file": "includes/functions.php",
+          "name": "filterTopics",
+          "typed": true,
+          "cases": [
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "",
+                0,
+                [
+                  "1"
+                ]
+              ],
+              "expected": [
+                {
+                  "title": "Rezervační systém pro autoškolu",
+                  "author": "Jan Dvořák",
+                  "year": 2023,
+                  "grade": 1
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                }
+              ],
+              "label": "témata (4), '', 0, ['1']"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "",
+                2024,
+                [
+                  "1",
+                  "2"
+                ]
+              ],
+              "expected": [
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                }
+              ],
+              "label": "témata (4), '', 2024, ['1', '2']"
+            },
+            {
+              "args": [
+                [
+                  {
+                    "title": "Rezervační systém pro autoškolu",
+                    "author": "Jan Dvořák",
+                    "year": 2023,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Webová galerie školních akcí",
+                    "author": "Eva Malá",
+                    "year": 2024,
+                    "grade": 2
+                  },
+                  {
+                    "title": "Plánovač školních rozvrhů",
+                    "author": "Klára Veselá",
+                    "year": 2024,
+                    "grade": 1
+                  },
+                  {
+                    "title": "Správa sportovního klubu",
+                    "author": "Martin Kolář",
+                    "year": 2025,
+                    "grade": 4
+                  }
+                ],
+                "",
+                0,
+                []
+              ],
+              "expected": [
+                {
+                  "title": "Rezervační systém pro autoškolu",
+                  "author": "Jan Dvořák",
+                  "year": 2023,
+                  "grade": 1
+                },
+                {
+                  "title": "Webová galerie školních akcí",
+                  "author": "Eva Malá",
+                  "year": 2024,
+                  "grade": 2
+                },
+                {
+                  "title": "Plánovač školních rozvrhů",
+                  "author": "Klára Veselá",
+                  "year": 2024,
+                  "grade": 1
+                },
+                {
+                  "title": "Správa sportovního klubu",
+                  "author": "Martin Kolář",
+                  "year": 2025,
+                  "grade": 4
+                }
+              ],
+              "label": "témata (4), '', 0, []"
+            }
+          ],
+          "hint": "Prázdný seznam = všechny známky, jinak `in_array((string) $topic['grade'], $grades, true)` (úkol 8)."
+        },
+        {
+          "id": "page-grades",
+          "description": "`index.php?znamka[]=1&znamka[]=2` ukazuje `Nalezeno: 5` a zaškrtnuté checkboxy",
+          "type": "php.http",
+          "steps": [
+            {
+              "path": "index.php",
+              "query": {
+                "znamka[]": [
+                  "1",
+                  "2"
+                ]
+              },
+              "expect": {
+                "regex": [
+                  "Nalezeno:\\s*5\\b",
+                  "<input(?=[^>]*name=\"znamka\\[\\]\")(?=[^>]*value=\"1\")(?=[^>]*\\bchecked\\b)[^>]*>"
+                ]
+              }
+            },
+            {
+              "path": "index.php",
+              "query": {
+                "znamka[]": [
+                  "1"
+                ],
+                "rok": "2024"
+              },
+              "expect": {
+                "regex": "Nalezeno:\\s*1\\b"
+              }
+            }
+          ],
+          "hint": "Do formuláře přidejte `<input type=\"checkbox\" name=\"znamka[]\" value=\"1\">` až `5`, načtěte je `nactiVolby()` a zaškrtnutým přidejte `checked` (úkol 8)."
+        }
+      ]
+    }
+  ]
+}

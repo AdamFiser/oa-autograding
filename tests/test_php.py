@@ -54,6 +54,8 @@ def test_source_contains_ignores_comments(repo):
     assert not res.passed and "chybí `getGreeting(`" in res.reason
     src = "<?php\nfunction getGreeting(): string { return 'Ahoj'; }\n$g = getGreeting ( ); ?>\n<p><?= $g ?></p>\n"
     assert page(repo, src, expected="<p>Ahoj</p>", source_contains=["getGreeting(", "$g=getGreeting()"]).passed
+    res = page(repo, "<?php // formular.php jen v komentáři\n", source_contains=["formular.php"])
+    assert not res.passed and res.reason.startswith("V kódu stránky chybí `formular.php`")
 
 
 def test_bad_comparison(repo):

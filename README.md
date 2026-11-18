@@ -46,7 +46,7 @@ v docstringu modulu `oa_autograding/checks/*.py`.
 ## Lokální ověření
 
 ```bash
-pip install git+https://github.com/adamfiser/oa-autograding@2026.11.3
+pip install git+https://github.com/adamfiser/oa-autograding@2026.11.4
 oa-check check --spec checks.json --repo cesta/k/repu
 ```
 Exit 0 = vše splněno, 1 = něco nesplněno, 2 = neplatný `checks.json`.
@@ -180,6 +180,40 @@ Příklad — `examples/php_07_funkce/checks.json` (šablona
 `oa-pva4-Syllabus/PHP_07_Funkce`, 29 požadavků; funkce přes `php.function`,
 že stránky dávají stejný výstup a počítají ho funkcí, přes `php.page`
 se `source_contains`; kostra dá 0 bodů, řešení 29).
+
+### PHP formuláře: požadavky přes HTTP
+
+Formulář odeslaný metodou POST, session, CSRF token, přesměrování ani nahrání
+souboru `php.page` nepokryje — ten stránku jen vykreslí s `$_GET`. Typ
+`php.http` (`oa_autograding/checks/php_http.py`) spustí nad **kopií** repa
+vestavěný server PHP (`php -S`) a projde kroky jako prohlížeč: cookies
+(session) drží mezi kroky, přesměrování nenásleduje, z odpovědi odstraní HTML
+komentáře. Chyba PHP (`Fatal error`, nezachycená výjimka) shodí krok vždy.
+
+| Parametr | Význam |
+|---|---|
+| `steps` | seznam kroků (povinné), viz níže |
+| `files` | po posledním kroku: `[{"glob": "uploads/*.png", "min": 1}, {"glob": "uploads/*.php", "max": 0}]` |
+| `timeout` | celkový limit v sekundách (výchozí `20`) |
+
+| Klíč kroku | Význam |
+|---|---|
+| `method`, `path` | `GET` (výchozí) nebo `POST`; cesta smí obsahovat `?…` |
+| `query` | slovník do adresy; seznam = opakovaný klíč, pole PHP pište `"znamka[]": ["1", "2"]` |
+| `form` | pole formuláře (seznam = opakovaný klíč, `"jmeno[]": "x"` podvrhne pole) |
+| `files` | `{"foto": {"fixture": "png", "filename": "foto.jpg", "content_type": "image/jpeg"}}` — fixtures `png`, `png-3mb`, `php`, `text`; formulář jde jako `multipart/form-data` |
+| `csrf` | název skrytého pole — hodnota se převezme z předchozí odpovědi; když tam pole není (úkol ještě není hotový), nepošle se |
+| `label` | popis kroku pro žáka („Odeslání prázdného formuláře“), jinak `` `POST contact.php` `` |
+| `expect` | `status`, `location` (část hlavičky `Location`), `contains`, `not_contains`, `regex` (vzor nebo seznam), `no_warnings` |
+
+Server běží s `display_errors=1`, `output_buffering=4096` (jako vývojové
+`php.ini`) a limity uploadu 8 MB / POST 16 MB, aby kontrola velikosti v kódu
+žáka dostala i soubor nad 2 MB.
+
+Příklad — `examples/php_08_formulare/checks.json` (šablona
+`oa-pva4-Syllabus/PHP_08_Formulare`, 34 požadavků; knihovna `formular.php`
+přes `php.function`, vyhledávání, kontaktní formulář s PRG a CSRF a upload
+fotky přes `php.http`; kostra dá 0 bodů, řešení 34).
 
 ### Program v Pythonu: datové typy, funkce, techniky
 

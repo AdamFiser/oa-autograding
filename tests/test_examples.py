@@ -127,3 +127,20 @@ def test_php07_reseni_passes_everything():
     rep = grade(load_spec(PHP07_EX / "checks.json"), PHP07_EX / "reseni")
     assert rep.passed, rep.failed_labels
     assert rep.score == rep.max_score == 29
+
+
+PHP08_EX = Path(__file__).resolve().parents[1] / "examples" / "php_08_formulare"
+
+
+@needs_php
+def test_php08_kostra_scores_zero():
+    rep = grade(load_spec(PHP08_EX / "checks.json"), PHP08_EX / "kostra")
+    # Formuláře v kostře jsou jen HTML bez zpracování — žádná kontrola nesmí projít.
+    assert rep.score == 0 and rep.max_score == 34
+
+
+@needs_php
+def test_php08_reseni_passes_everything():
+    rep = grade(load_spec(PHP08_EX / "checks.json"), PHP08_EX / "reseni")
+    assert rep.passed, rep.failed_labels
+    assert rep.score == rep.max_score == 34

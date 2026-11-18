@@ -91,9 +91,8 @@ def php_page(ctx: CheckContext, p: dict[str, Any]) -> CheckResult:
         code = re.sub(r"\s+", "", strip_html_comments(src))
         missing = [t for t in p["source_contains"] if re.sub(r"\s+", "", t) not in code]
         if missing:
-            return CheckResult(
-                False, f"Stránka ukazuje správný výsledek, ale v jejím kódu chybí `{missing[0]}` (komentáře se nepočítají).", details,
-            )
+            lead = "Stránka ukazuje správný výsledek, ale v jejím kódu" if "expected" in p else "V kódu stránky"
+            return CheckResult(False, f"{lead} chybí `{missing[0]}` (komentáře se nepočítají).", details)
     return CheckResult(True, details=details)
 
 
